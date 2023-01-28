@@ -1,10 +1,11 @@
 """Main application file. Contains the general operating logic."""
-
+import __init__ as init
+import sys
 from menu import option_menu, welcome_menu
-from mentalapp.mod_dataset.dataset import Dataset
-from mentalapp import load_config_mentalapp
+from mod_dataset.dataset import Dataset
 
-configuration_main = load_config_mentalapp()
+
+configuration_main = init.load_config_mentalapp()
 
 
 def dataset_initialize():
@@ -21,12 +22,12 @@ def dataset_initialize():
 
 
 def main():
-    """Main function of the application. Manages the menu and calls to the main blocks.
+    """Main function of the application. Manages the menu and calls to the main blocks
     :return: Nothing
     """
     welcome_menu()
     dataset = dataset_initialize()
     option_menu()
 
-
-main()
+if __name__ == "__main__":
+    main()

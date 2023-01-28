@@ -3,7 +3,7 @@
 import csv
 import os
 
-from mentalapp.mod_message.message import Message
+from mod_message.message import Message as message
 
 
 class Dataset:
@@ -14,7 +14,7 @@ class Dataset:
 
     def read_file(self, name_file):
         """
-        Function to read Suicide Detection file which contains raw datas.
+        Function to read Suicide Detection file which contains raw datas
         :param name_file: Name of file read
         :rtype: String
         :return: lines of file read.
@@ -37,4 +37,4 @@ class Dataset:
         :rtype: list[dict[String:String]]
         :return: Nothing
         """
-        self.dataset = list(map(lambda line: Message(line), list_data))
+        self.dataset = list(map(lambda line: message(line), list_data))
