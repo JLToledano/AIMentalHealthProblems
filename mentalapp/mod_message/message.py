@@ -1,6 +1,5 @@
 """File defining the creation class of each data on dataset"""
 
-
 class Message:
     """Class containing one case of dataset"""
 
@@ -8,8 +7,33 @@ class Message:
         """
         Init function of Message class
         :param dict_data: One line of raw data with text and classification (class)
-        :type: dict
+        :type: dict[String:String]
         :return: Nothing
         """
-        self.text = dict_data['text']
-        self.type_class = dict_data['class']
+
+        self.__text = dict_data['text']
+
+        #Written classification is translated into a numerical classification.
+        if (dict_data['class'] == 'suicide'):
+            self.__type_class = 1 #suicide
+        else:
+            self.__type_class = 0 #non-suicide
+
+
+    def get_text(self):
+        """
+        Obtaining input data message
+        :return: Message from test subject
+        :type: String
+        """
+
+        return self.__text
+
+    def get_type_class(self):
+        """
+        Obtaining message classification
+        :return: Classification messague from test subject
+        :type: Int
+        """
+
+        return self.__type_class
