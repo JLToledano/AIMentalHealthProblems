@@ -1,7 +1,8 @@
-"""File containing the console message printing functions."""
+"""File containing the console message printing functions"""
 
 def welcome_menu():
-    """Function which prints the welcome message when starting the application.
+    """
+    Function which prints the welcome message when starting the application
     :return: Nothing
     """
     print("""
@@ -45,9 +46,12 @@ def welcome_menu():
 
 
 def option_menu():
-    """Function which prints the options message.
+    """
+    Function which prints the options message
     :return: Nothing
     """   
     print("Escoge una de las siguientes opciones:")
-    print("1. Personalizar red neuronal")
-    print("2. Ayuda")
+    print("1. Utilizar modelo preentrenado")
+    print("2. Personalizar parámetros entrenamiento")
+    print("3. Personalizar ruta dataset")
+    print("4. Ayuda")
