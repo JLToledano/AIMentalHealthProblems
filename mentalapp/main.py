@@ -146,7 +146,7 @@ def main():
     #Options available to the user
     selected_option = 0
     menu_options = {
-        '1': "pass",
+        '1': "use_classify_model(configuration_main, device)",
         '2': "training_model_scratch(configuration_main, device, train_dataset)",
         '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
         '4': "pass",
