@@ -13,8 +13,7 @@ from menu import option_menu, welcome_menu
 from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
-from menu_options import data_loader, training_model_scratch
-
+from menu_options import *
 
 #Load constants and predefined application parameters
 configuration_main = init.load_config_mentalapp()
@@ -149,7 +148,7 @@ def main():
     menu_options = {
         '1': "pass",
         '2': "training_model_scratch(configuration_main, device, train_dataset)",
-        '3': "pass",
+        '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
         '4': "pass",
         '5': "pass",
         '6': "pass",
