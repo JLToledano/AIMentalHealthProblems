@@ -13,6 +13,7 @@ from menu import option_menu, welcome_menu
 from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
+from menu_options import data_loader, training_model_scratch
 
 
 #Load constants and predefined application parameters
@@ -142,8 +143,32 @@ def main():
     
     #Raw dataset initialization
     complete_dataset,train_dataset,test_dataset = dataset_initialize()
+
+    #Options available to the user
+    selected_option = 0
+    menu_options = {
+        '1': "pass",
+        '2': "training_model_scratch(configuration_main, device, train_dataset)",
+        '3': "pass",
+        '4': "pass",
+        '5': "pass",
+        '6': "pass",
+    }
     
-    option_menu()
+    #As long as user does not select the exit option, program continues to run
+    while selected_option != "7":
+        option_menu()
+        selected_option = input("Opción: ")
+        
+        #User option is executed if possible
+        if selected_option in menu_options.keys():
+            eval(menu_options[selected_option])
+        else:
+            if selected_option == '7':
+                pass
+            else:
+                print("Opción incorrecta, por favor selecione una de las opciones disponibles")
+                print("")
 
     #Function transforming input data into special codes (tokens) for BERT model
     tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
