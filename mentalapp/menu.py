@@ -42,7 +42,6 @@ def welcome_menu():
     - - - - - - - - m- - - -   - - - -   - - - - - - - - -   - - -       - - -   - - - - - - - - -         - - -         - - - -   - - - -m- - - - - - - -
     """)
     print("Bienvenido a la aplicación")
-    print("Puedes utilizar la opción configurada o personalizar entre las opciones disponibles")
 
 
 def option_menu():
@@ -51,7 +50,10 @@ def option_menu():
     :return: Nothing
     """   
     print("Escoge una de las siguientes opciones:")
-    print("1. Utilizar modelo preentrenado")
-    print("2. Personalizar parámetros entrenamiento")
-    print("3. Personalizar ruta dataset")
-    print("4. Ayuda")
+    print("    1. Utilizar modelo preentrenado")
+    print("    2. Entrenar modelo")
+    print("    3. Evaluar modelo")
+    print("    4. Personalizar parámetros entrenamiento")
+    print("    5. Personalizar ruta dataset")
+    print("    6. Ayuda")
+    print("    7. Salir")
