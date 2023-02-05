@@ -1,4 +1,5 @@
 import os
+import pathlib
 import numpy
 import torch
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
@@ -37,6 +38,43 @@ def save_model(model):
 
     #Torch model is stored in selected path
     torch.save(model,os.path.join(os.path.dirname(os.path.abspath(__file__)), model_path))
+
+
+def load_model():
+    """
+    A model pre-trained by the user is loaded
+    :return: Model
+    :type: MODELSentimentClassifier
+    """
+
+    list_pretraining_models = []
+    number_file = 0
+    selected_file = False
+
+    #The directory where models are located is established
+    path_models = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
+    address = pathlib.Path(path_models)
+
+    print("Ficheros disponibles:")
+
+    #Each file available in directory is printed and added to list
+    for file in address.iterdir():
+        number_file += 1
+        list_pretraining_models.append(file.name)
+        print("    " + str(number_file) + ". " + file.name)
+
+    #User is asked to choose a pre-trained model and is not stopped until a valid one is chosen
+    while not selected_file:
+        try:
+            number_file = int(input("Seleccione el número del modelo que desea: "))
+            name_file = list_pretraining_models[number_file]
+            #Torch model is loaded
+            model = torch.load(os.path.join(path_models, name_file))
+            selected_file = True
+        except:
+            print("Número de fichero no válido")
+
+    return model
 
 
 def data_loader(dataset,tokenizer,max_len,batch_size,num_workers):
@@ -120,4 +158,44 @@ def training_model_scratch(configuration_main, device, train_dataset):
     
     #Trained model is stored
     save_model(model)
+
+
+def evaluating_model_pretraining(configuration_main, device, test_dataset):
+    """
+    The pre-training model and the additional layers added are evaluated
+    :param configuration_main: Evaluating configurations
+    :type: dict[String:String]
+    :param device: Calculation optimizer
+    :type: Torch Device
+    :param test_dataset: Dataset with data for evaluating
+    :type: Dataset
+    :return: Nothing
+    """
+
+    #Pre-trained Torch model is loaded
+    model = load_model()
+
+    #Function transforming input data into special codes (tokens) for BERT model
+    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+
+    #Creation of Pytorch dataset for evaluating
+    test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
+
+    #Total number of evaluating data
+    number_test_data = len(test_dataset)
+
+    #Error function to be minimized
+    loss_fn = nn.CrossEntropyLoss().to(device)
     
+    #For each epoch, the model is validated.
+    for epoch in range(configuration_main['EPOCHS']):
+        print('Epoch {} de {}'.format(epoch + 1, configuration_main['EPOCHS']))
+        print('--------------------')
+
+        #Model validated and parameter update
+        test_accuracy, test_loss = eval_model(
+            model, test_data_loader, loss_fn, device, number_test_data
+        )
+
+        print('Validación: Loss:{}, Accuracy:{}'.format(test_loss, test_accuracy))
+        print('')
