@@ -67,7 +67,7 @@ def load_model():
     while not selected_file:
         try:
             number_file = int(input("Seleccione el número del modelo que desea: "))
-            name_file = list_pretraining_models[number_file]
+            name_file = list_pretraining_models[number_file - 1]
             #Torch model is loaded
             model = torch.load(os.path.join(path_models, name_file))
             selected_file = True
