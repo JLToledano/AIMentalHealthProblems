@@ -8,8 +8,12 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from sklearn.model_selection import train_test_split
+from rich.console import Console
+from rich.theme import Theme
+from rich.panel import Panel
+from rich.prompt import Prompt
 
-from menu import option_menu, welcome_menu
+from TUI_menu import option_menu, welcome_menu
 from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
@@ -151,14 +155,18 @@ def main():
         '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
         '4': "pass",
         '5': "pass",
-        '6': "pass",
+        '6': "help_menu()",
     }
     
     #As long as user does not select the exit option, program continues to run
     while selected_option != "7":
         option_menu()
-        selected_option = input("Opción: ")
-        
+
+        custom_theme = Theme({"success": "green", "error": "red"})
+        console = Console(theme = custom_theme)
+        selected_option = Prompt.ask("Seleccione una opción")
+        console.print(Panel.fit("Opción: " + selected_option))
+
         #User option is executed if possible
         if selected_option in menu_options.keys():
             eval(menu_options[selected_option])
@@ -166,7 +174,7 @@ def main():
             if selected_option == '7':
                 pass
             else:
-                print("Opción incorrecta, por favor selecione una de las opciones disponibles")
+                console.print("[error] Opción incorrecta [/error], por favor selecione una de las [success] opciones disponibles [/success]")
                 print("")
 
     #Function transforming input data into special codes (tokens) for BERT model
