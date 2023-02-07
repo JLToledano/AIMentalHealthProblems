@@ -8,7 +8,6 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from sklearn.model_selection import train_test_split
 
-from menu import option_menu, welcome_menu
 from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
