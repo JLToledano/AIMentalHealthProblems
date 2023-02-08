@@ -13,7 +13,7 @@ from rich.theme import Theme
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from TUI_menu import option_menu, welcome_menu
+from TUI_menu import option_menu, welcome_menu, help_menu
 from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
