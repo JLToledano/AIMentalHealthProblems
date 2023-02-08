@@ -177,22 +177,6 @@ def main():
                 console.print("[error] Opción incorrecta [/error], por favor selecione una de las [success] opciones disponibles [/success]")
                 print("")
 
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
-
-    #Creation of Pytorch dataset for training and evaluation
-    train_data_loader = data_loader(train_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
-    test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
-
-    #Creation of BERT model
-    model = BERTSentimentClassifier(configuration_main['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'], configuration_main['DROP_OUT_BERT'])
-
-    #Model is taken to the GPU if available
-    model = model.to(device)
-
-    #Model training and evaluation
-    training(model, device, train_data_loader, len(train_dataset), test_data_loader, len(test_dataset))
-    
 
 if __name__ == "__main__":
     main()
