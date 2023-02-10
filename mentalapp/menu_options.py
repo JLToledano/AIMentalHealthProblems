@@ -6,9 +6,8 @@ from transformers import BertTokenizer, get_linear_schedule_with_warmup
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
-from sklearn.model_selection import train_test_split
+from rich.prompt import Prompt
 
-from mod_dataset.dataset import Dataset
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
 
@@ -244,3 +243,16 @@ def use_classify_model(configuration_main, device):
         print("Clasificación: Suicide")
     else:
         print("Clasificación: Non-Suicide")
+
+
+def assign_new_dataset():
+    """
+    Function for assigning a new dataset file as the source of the training and evaluation data
+    :return: Name of new file
+    :param: String
+    """
+
+    #User is prompted for a filename by displaying the default option
+    file_name = Prompt.ask("Por favor indique el nombre de su fichero", default="Suicide_Detection.csv")
+
+    return file_name
