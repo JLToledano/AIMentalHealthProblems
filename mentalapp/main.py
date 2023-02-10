@@ -3,7 +3,7 @@
 import __init__ as init
 import numpy
 import torch
-from transformers import BertTokenizer, get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
@@ -15,7 +15,6 @@ from rich.prompt import Prompt
 
 from TUI_menu import option_menu, welcome_menu, help_menu
 from mod_dataset.dataset import Dataset
-from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
 from menu_options import *
 
@@ -154,7 +153,7 @@ def main():
         '2': "training_model_scratch(configuration_main, device, train_dataset)",
         '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
         '4': "pass",
-        '5': "pass",
+        '5': "configuration_main['FILE_DATASET_NAME'] = assign_new_dataset()",
         '6': "help_menu()",
     }
     
@@ -162,14 +161,28 @@ def main():
     while selected_option != "7":
         option_menu()
 
-        custom_theme = Theme({"success": "green", "error": "red"})
+        custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
         console = Console(theme = custom_theme)
         selected_option = Prompt.ask("Seleccione una opción")
         console.print(Panel.fit("Opción: " + selected_option))
 
         #User option is executed if possible
         if selected_option in menu_options.keys():
-            eval(menu_options[selected_option])
+            exec(menu_options[selected_option])
+            #If new dataset is specified, training and evaluation datasets are reloaded
+            if selected_option == '5':
+                valid_file = False
+                while not valid_file:
+                    #User is informed of result of data upload and, if necessary, is asked again for a file name
+                    try:
+                        complete_dataset,train_dataset,test_dataset = dataset_initialize()
+                        console.print("[success]Nuevo fichero cargado[/success]\n", style="bold")
+                        valid_file = True
+                    except:
+                        console.print("[error]Nombre de fichero incorrecto[/error]", style="bold")
+                        console.print("Compruebe el [required_parameter]nombre de fichero[/required_parameter] introducido y si está situado en la [required_parameter]ruta[/required_parameter] [option]mentalapp/mod_dataset/files[/option] dentro del proyecto\n", style="bold")
+
+                        exec(menu_options[selected_option])
         else:
             if selected_option == '7':
                 pass
