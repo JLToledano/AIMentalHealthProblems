@@ -111,7 +111,7 @@ def option_menu():
     third_option_message_markdown = Markdown(third_option_message)
     console.print(third_option_message_markdown, style="bold")
 
-    fourth_option_message = """4. Personalizar parámetros entrenamiento"""
+    fourth_option_message = """4. Personalizar configuración de parámetros"""
     fourth_option_message_markdown = Markdown(fourth_option_message)
     console.print(fourth_option_message_markdown, style="bold")
 
@@ -206,7 +206,7 @@ def help_menu():
     fourth_option_table_parameters.add_row("DROP_OUT_BERT", "0.3", "Tanto por uno de neuronas que se desactivan aleatoriamente en una de las capas de la red nueronal", "[option]APLICABLE EN BERT[/option]")
 
     fourth_option_table = Table(expand = True)
-    fourth_option_table.add_column("[option]OPCIÓN 4[/option] Personalizar parámetros entrenamiento", justify = "full")
+    fourth_option_table.add_column("[option]OPCIÓN 4[/option] Personalizar configuración de parámetros", justify = "full")
     fourth_option_table.add_row(
     """En esta opción el usuario podrá cambiar la configuración inicial de los parámetros de división del dataset de datos, entrenamiento y evaluación.\n"""
     + """\n""" +
