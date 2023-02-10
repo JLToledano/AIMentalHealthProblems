@@ -224,7 +224,7 @@ def help_menu():
     fifth_option_table = Table(expand = True)
     fifth_option_table.add_column("[option]OPCIÓN 5[/option] Personalizar ruta dataset", justify = "full")
     fifth_option_table.add_row(
-    """En esta opción el usuario puede cambiar la ruta predefinida del dataset para utilizar uno configurado por el usuario y que esté situado en otro directorio del ordenador.\n"""
+    """En esta opción el usuario puede cambiar la ruta predefinida del dataset para utilizar uno configurado por el usuario pero que esté situado en el mismo directorio destinado a datasets de la aplicación.\n"""
     + """\n""" +
     """La extensión del archivo deberá ser .csv y con el siguiente formato de mensajes:\n"""
     + """\n""" +
