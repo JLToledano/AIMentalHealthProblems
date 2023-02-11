@@ -152,7 +152,7 @@ def main():
         '1': "use_classify_model(configuration_main, device)",
         '2': "training_model_scratch(configuration_main, device, train_dataset)",
         '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
-        '4': "pass",
+        '4': "configuration_main = customize_parameter_configuration(configuration_main)",
         '5': "configuration_main['FILE_DATASET_NAME'] = assign_new_dataset()",
         '6': "help_menu()",
     }
@@ -168,21 +168,26 @@ def main():
 
         #User option is executed if possible
         if selected_option in menu_options.keys():
-            exec(menu_options[selected_option])
-            #If new dataset is specified, training and evaluation datasets are reloaded
-            if selected_option == '5':
-                valid_file = False
-                while not valid_file:
-                    #User is informed of result of data upload and, if necessary, is asked again for a file name
-                    try:
-                        complete_dataset,train_dataset,test_dataset = dataset_initialize()
-                        console.print("[success]Nuevo fichero cargado[/success]\n", style="bold")
-                        valid_file = True
-                    except:
-                        console.print("[error]Nombre de fichero incorrecto[/error]", style="bold")
-                        console.print("Compruebe el [required_parameter]nombre de fichero[/required_parameter] introducido y si está situado en la [required_parameter]ruta[/required_parameter] [option]mentalapp/mod_dataset/files[/option] dentro del proyecto\n", style="bold")
+            #If execution fails, user is prompted to review parameter or application settings.
+            try:
+                exec(menu_options[selected_option])
+                #If new dataset is specified, training and evaluation datasets are reloaded
+                if selected_option == '5':
+                    valid_file = False
+                    while not valid_file:
+                        #User is informed of result of data upload and, if necessary, is asked again for a file name
+                        try:
+                            complete_dataset,train_dataset,test_dataset = dataset_initialize()
+                            console.print("[success]Nuevo fichero cargado[/success]\n", style="bold")
+                            valid_file = True
+                        except:
+                            console.print("[error]Nombre de fichero incorrecto[/error]", style="bold")
+                            console.print("Compruebe el [required_parameter]nombre de fichero[/required_parameter] introducido y si está situado en la [required_parameter]ruta[/required_parameter] [option]mentalapp/mod_dataset/files[/option] dentro del proyecto\n", style="bold")
 
-                        exec(menu_options[selected_option])
+                            exec(menu_options[selected_option])
+            except:
+                console.print("[error]No se ha podido ejecutar[/error] la opción elegida, por favor compruebe la configuración elegida e [success]inténtelo de nuevo[/success]")
+
         else:
             if selected_option == '7':
                 pass

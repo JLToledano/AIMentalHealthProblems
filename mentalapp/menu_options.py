@@ -6,7 +6,8 @@ from transformers import BertTokenizer, get_linear_schedule_with_warmup
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
-from rich.prompt import Prompt
+from rich.prompt import Prompt, IntPrompt, FloatPrompt
+from rich.prompt import Confirm
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
@@ -245,11 +246,45 @@ def use_classify_model(configuration_main, device):
         print("Clasificación: Non-Suicide")
 
 
+def customize_parameter_configuration(configuration_main):
+    """
+    Function for changing value of the general training and evaluation settings of neural network
+    :param configuration_main: Dictionary with general settings
+    :type: dict[String:String]
+    :return: General settings modified or same if user decides not to make changes
+    :type: dict[String:String]
+    """
+    
+    #User is prompted for maximum data length by displaying the default option
+    configuration_main['MAX_DATA_LEN'] = IntPrompt.ask("Por favor indique el número máximo de palabras que admita el modelo", default=configuration_main['MAX_DATA_LEN'])
+
+    #User is prompted for batch size by displaying the default option
+    configuration_main['BATCH_SIZE'] = IntPrompt.ask("Por favor indique el tamaño de lote", default=configuration_main['BATCH_SIZE'])
+
+    #User is prompted for number of epochs by displaying the default option
+    configuration_main['EPOCHS'] = IntPrompt.ask("Por favor indique el número de épocas (iteraciones)", default=configuration_main['EPOCHS'])
+
+    #User is prompted for number of parallel processes by displaying the default option
+    configuration_main['DATALOADER_NUM_WORKERS'] = IntPrompt.ask("Por favor indique el número de procesos paralelos", default=configuration_main['DATALOADER_NUM_WORKERS'])
+
+    #User is prompted for drop out per one by displaying the default option
+    configuration_main['DROP_OUT_BERT'] = FloatPrompt.ask("Por favor indique el tanto por uno de drop out para BERT", default=configuration_main['DROP_OUT_BERT'])
+
+    confirm_changes = Confirm.ask("¿Estás seguro de los cambios realizados?")
+
+    #If user confirms changes are perpetuated
+    if not confirm_changes:
+        #User is given possibility to execute changes again.
+        configuration_main = customize_parameter_configuration(configuration_main)
+        
+    return configuration_main
+
+
 def assign_new_dataset():
     """
     Function for assigning a new dataset file as the source of the training and evaluation data
     :return: Name of new file
-    :param: String
+    :type: String
     """
 
     #User is prompted for a filename by displaying the default option
