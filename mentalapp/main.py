@@ -3,17 +3,20 @@
 import __init__ as init
 import numpy
 import torch
-from transformers import BertTokenizer, get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from sklearn.model_selection import train_test_split
+from rich.console import Console
+from rich.theme import Theme
+from rich.panel import Panel
+from rich.prompt import Prompt
 
-from menu import option_menu, welcome_menu
+from TUI_menu import option_menu, welcome_menu, help_menu
 from mod_dataset.dataset import Dataset
-from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
-
+from menu_options import *
 
 #Load constants and predefined application parameters
 configuration_main = init.load_config_mentalapp()
@@ -142,25 +145,56 @@ def main():
     
     #Raw dataset initialization
     complete_dataset,train_dataset,test_dataset = dataset_initialize()
+
+    #Options available to the user
+    selected_option = 0
+    menu_options = {
+        '1': "use_classify_model(configuration_main, device)",
+        '2': "training_model_scratch(configuration_main, device, train_dataset)",
+        '3': "evaluating_model_pretraining(configuration_main, device, test_dataset)",
+        '4': "configuration_main = customize_parameter_configuration(configuration_main)",
+        '5': "configuration_main['FILE_DATASET_NAME'] = assign_new_dataset()",
+        '6': "help_menu()",
+    }
     
-    option_menu()
+    #As long as user does not select the exit option, program continues to run
+    while selected_option != "7":
+        option_menu()
 
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+        custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+        console = Console(theme = custom_theme)
+        selected_option = Prompt.ask("Seleccione una opción")
+        console.print(Panel.fit("Opción: " + selected_option))
 
-    #Creation of Pytorch dataset for training and evaluation
-    train_data_loader = data_loader(train_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
-    test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
+        #User option is executed if possible
+        if selected_option in menu_options.keys():
+            #If execution fails, user is prompted to review parameter or application settings.
+            try:
+                exec(menu_options[selected_option])
+                #If new dataset is specified, training and evaluation datasets are reloaded
+                if selected_option == '5':
+                    valid_file = False
+                    while not valid_file:
+                        #User is informed of result of data upload and, if necessary, is asked again for a file name
+                        try:
+                            complete_dataset,train_dataset,test_dataset = dataset_initialize()
+                            console.print("[success]Nuevo fichero cargado[/success]\n", style="bold")
+                            valid_file = True
+                        except:
+                            console.print("[error]Nombre de fichero incorrecto[/error]", style="bold")
+                            console.print("Compruebe el [required_parameter]nombre de fichero[/required_parameter] introducido y si está situado en la [required_parameter]ruta[/required_parameter] [option]mentalapp/mod_dataset/files[/option] dentro del proyecto\n", style="bold")
 
-    #Creation of BERT model
-    model = BERTSentimentClassifier(configuration_main['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'], configuration_main['DROP_OUT_BERT'])
+                            exec(menu_options[selected_option])
+            except:
+                console.print("[error]No se ha podido ejecutar[/error] la opción elegida, por favor compruebe la configuración elegida e [success]inténtelo de nuevo[/success]")
 
-    #Model is taken to the GPU if available
-    model = model.to(device)
+        else:
+            if selected_option == '7':
+                pass
+            else:
+                console.print("[error] Opción incorrecta [/error], por favor selecione una de las [success] opciones disponibles [/success]")
+                print("")
 
-    #Model training and evaluation
-    training(model, device, train_data_loader, len(train_dataset), test_data_loader, len(test_dataset))
-    
 
 if __name__ == "__main__":
     main()
