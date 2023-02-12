@@ -3,10 +3,7 @@
 import __init__ as init
 import numpy
 import torch
-from transformers import get_linear_schedule_with_warmup
-from torch import nn
 from torch.utils.data import DataLoader
-from torch.optim import AdamW
 from sklearn.model_selection import train_test_split
 from rich.console import Console
 from rich.theme import Theme
@@ -15,7 +12,6 @@ from rich.prompt import Prompt
 
 from TUI_menu import option_menu, welcome_menu, help_menu
 from mod_dataset.dataset import Dataset
-from trainer import train_model, eval_model
 from menu_options import *
 
 #Load constants and predefined application parameters
@@ -73,60 +69,6 @@ def data_loader(dataset,tokenizer,max_len,batch_size,num_workers):
 
     #Pytorch-specific DataLoader is created
     return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
-
-
-def training(model, device, train_data_loader, number_train_data, test_data_loader, number_test_data):
-    """
-    The pre-training module and the additional layers added are trained and evaluated.
-    :param model: Neural network model
-    :type: MODELSentimentClassifier
-    :param device: Calculation optimizer
-    :type: Torch Device
-    :param train_data_loader: Dataset custom Pytorch for training
-    :type: DataLoader
-    :param number_train_data: Total number of training data
-    :type: Int
-    :param test_data_loader: Dataset customized Pytorch for evaluation
-    :type: DataLoader
-    :param number_test_data: Total number of evaluating data
-    :type: Int
-    :return: Nothing
-    """
-
-    #Optimizer is created and a learning rate lr is assigned.
-    optimizer = AdamW(model.parameters(), lr=2e-5)
-
-    #Total number of training iterations
-    total_steps = len(train_data_loader) * configuration_main['EPOCHS']
-
-    #Function to reduce the learning rate
-    scheduler = get_linear_schedule_with_warmup(
-        optimizer, #Optimizer function
-        num_warmup_steps = 0, #Number of iterations the model waits for to start reducing the learning rate
-        num_training_steps = total_steps #Total number of training steps
-    )
-
-    #Error function to be minimized
-    loss_fn = nn.CrossEntropyLoss().to(device)
-    
-    #For each epoch, the model is trained and validated.
-    for epoch in range(configuration_main['EPOCHS']):
-        print('Epoch {} de {}'.format(epoch + 1, configuration_main['EPOCHS']))
-        print('--------------------')
-
-        #Model training and parameter update
-        model, optimizer, scheduler, train_accuracy, train_loss = train_model(
-            model, train_data_loader, loss_fn, optimizer, device, scheduler, number_train_data
-        )
-
-        #Model validated and parameter update
-        test_accuracy, test_loss = eval_model(
-            model, test_data_loader, loss_fn, device, number_test_data
-        )
-
-        print('Entrenamiento: Loss:{}, Accuracy:{}'.format(train_loss, train_accuracy))
-        print('Validación: Loss:{}, Accuracy:{}'.format(test_loss, test_accuracy))
-        print('')
 
 
 def main():
