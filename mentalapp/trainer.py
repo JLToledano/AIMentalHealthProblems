@@ -78,7 +78,7 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
         #Calculate the metrics required for the design study
         metrics_model(labels, preds)
 
-    return model, optimizer, scheduler, correct_predictions.double() / number_data, np.mean(losses)
+    return model, optimizer, scheduler
 
 
 def eval_model(model, data_loader, loss_fn, device, number_data):
@@ -96,8 +96,6 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
     :type: Int
     :return: Training accuracy
     :type: Tensor
-    :return: Mean error value
-    :type: Float64
     """
 
     #The model is put into evaluating mode
@@ -131,8 +129,6 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
 
             #Calculate the metrics required for the design study
             metrics_model(labels, preds)
-
-    return correct_predictions.double() / number_data, np.mean(losses)
 
 
 def metrics_model(labels, predictions):
