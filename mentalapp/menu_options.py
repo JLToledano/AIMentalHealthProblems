@@ -148,12 +148,9 @@ def training_model_scratch(configuration_main, device, train_dataset):
         print('--------------------')
 
         #Model training and parameter update
-        model, optimizer, scheduler, train_accuracy, train_loss = train_model(
+        model, optimizer, scheduler = train_model(
             model, train_data_loader, loss_fn, optimizer, device, scheduler, number_train_data
         )
-
-        print('Entrenamiento: Loss:{}, Accuracy:{}'.format(train_loss, train_accuracy))
-        print('')
     
     #Trained model is stored
     save_model(model)
@@ -186,18 +183,8 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
     #Error function to be minimized
     loss_fn = nn.CrossEntropyLoss().to(device)
     
-    #For each epoch, the model is validated.
-    for epoch in range(configuration_main['EPOCHS']):
-        print('Epoch {} de {}'.format(epoch + 1, configuration_main['EPOCHS']))
-        print('--------------------')
-
-        #Model validated and parameter update
-        test_accuracy, test_loss = eval_model(
-            model, test_data_loader, loss_fn, device, number_test_data
-        )
-
-        print('Validación: Loss:{}, Accuracy:{}'.format(test_loss, test_accuracy))
-        print('')
+    #Model validated
+    eval_model(model, test_data_loader, loss_fn, device, number_test_data)
 
 
 def use_classify_model(configuration_main, device):
