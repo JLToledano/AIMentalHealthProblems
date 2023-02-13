@@ -177,20 +177,22 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
     #Pre-trained Torch model is loaded
     model = load_model()
 
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+    #If it has been possible to select a model, text is requested and sorted
+    if model is not None:
+        #Function transforming input data into special codes (tokens) for BERT model
+        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
-    #Creation of Pytorch dataset for evaluating
-    test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
+        #Creation of Pytorch dataset for evaluating
+        test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
 
-    #Total number of evaluating data
-    number_test_data = len(test_dataset)
+        #Total number of evaluating data
+        number_test_data = len(test_dataset)
 
-    #Error function to be minimized
-    loss_fn = nn.CrossEntropyLoss().to(device)
-    
-    #Model validated
-    eval_model(model, test_data_loader, loss_fn, device, number_test_data)
+        #Error function to be minimized
+        loss_fn = nn.CrossEntropyLoss().to(device)
+        
+        #Model validated
+        eval_model(model, test_data_loader, loss_fn, device, number_test_data)
 
 
 def use_classify_model(configuration_main, device):
