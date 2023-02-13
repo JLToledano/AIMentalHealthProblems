@@ -54,24 +54,30 @@ def load_model():
     path_models = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
     address = pathlib.Path(path_models)
 
-    print("Ficheros disponibles:")
+    #If model directory is empty, user is prompted to train one first
+    if len(os.listdir(address)) == 0:
+        print("No existen modelos actualmente. Por favor entrene uno para poder evaluarlo o utilizarlo")
+        model = None
+    #If trained models exist, they are listed for user to choose one of them
+    else:
+        print("Ficheros disponibles:")
 
-    #Each file available in directory is printed and added to list
-    for file in address.iterdir():
-        number_file += 1
-        list_pretraining_models.append(file.name)
-        print("    " + str(number_file) + ". " + file.name)
+        #Each file available in directory is printed and added to list
+        for file in address.iterdir():
+            number_file += 1
+            list_pretraining_models.append(file.name)
+            print("    " + str(number_file) + ". " + file.name)
 
-    #User is asked to choose a pre-trained model and is not stopped until a valid one is chosen
-    while not selected_file:
-        try:
-            number_file = int(input("Seleccione el número del modelo que desea: "))
-            name_file = list_pretraining_models[number_file - 1]
-            #Torch model is loaded
-            model = torch.load(os.path.join(path_models, name_file))
-            selected_file = True
-        except:
-            print("Número de fichero no válido")
+        #User is asked to choose a pre-trained model and is not stopped until a valid one is chosen
+        while not selected_file:
+            try:
+                number_file = int(input("Seleccione el número del modelo que desea: "))
+                name_file = list_pretraining_models[number_file - 1]
+                #Torch model is loaded
+                model = torch.load(os.path.join(path_models, name_file))
+                selected_file = True
+            except:
+                print("Número de fichero no válido")
 
     return model
 
@@ -171,20 +177,22 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
     #Pre-trained Torch model is loaded
     model = load_model()
 
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+    #If it has been possible to select a model, text is requested and sorted
+    if model is not None:
+        #Function transforming input data into special codes (tokens) for BERT model
+        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
-    #Creation of Pytorch dataset for evaluating
-    test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
+        #Creation of Pytorch dataset for evaluating
+        test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
 
-    #Total number of evaluating data
-    number_test_data = len(test_dataset)
+        #Total number of evaluating data
+        number_test_data = len(test_dataset)
 
-    #Error function to be minimized
-    loss_fn = nn.CrossEntropyLoss().to(device)
-    
-    #Model validated
-    eval_model(model, test_data_loader, loss_fn, device, number_test_data)
+        #Error function to be minimized
+        loss_fn = nn.CrossEntropyLoss().to(device)
+        
+        #Model validated
+        eval_model(model, test_data_loader, loss_fn, device, number_test_data)
 
 
 def use_classify_model(configuration_main, device):
@@ -200,37 +208,39 @@ def use_classify_model(configuration_main, device):
     #Pre-trained Torch model is loaded
     model = load_model()
 
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+    #If it has been possible to select a model, text is requested and sorted
+    if model is not None:
+        #Function transforming input data into special codes (tokens) for BERT model
+        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
-    #User mesagge
-    text = input("Inserte el texto que quiere clasificar:\n")
+        #User mesagge
+        text = input("Inserte el texto que quiere clasificar:\n")
 
-    #Coding of input data
-    encoding_text = tokenizer.encode_plus(
-        text, #Original message
-        max_length = configuration_main['MAX_DATA_LEN'], #Maximum number of tokens (counting special tokens)
-        truncation = True, #Ignoring tokens beyond the set number of tokens
-        add_special_tokens = True, #Special tokens [CLS], [SEP] and [PAD] added
-        return_token_type_ids = False,
-        padding = 'max_length', #If total number of tokens is less than the established maximum, it is filled with [PAD] until the maximum is reached
-        return_attention_mask = True, #Model is instructed to pay attention only to non-empty tokens during training
-        return_tensors = 'pt' #Final result of the encoder in Pytorch numbers
-    )
+        #Coding of input data
+        encoding_text = tokenizer.encode_plus(
+            text, #Original message
+            max_length = configuration_main['MAX_DATA_LEN'], #Maximum number of tokens (counting special tokens)
+            truncation = True, #Ignoring tokens beyond the set number of tokens
+            add_special_tokens = True, #Special tokens [CLS], [SEP] and [PAD] added
+            return_token_type_ids = False,
+            padding = 'max_length', #If total number of tokens is less than the established maximum, it is filled with [PAD] until the maximum is reached
+            return_attention_mask = True, #Model is instructed to pay attention only to non-empty tokens during training
+            return_tensors = 'pt' #Final result of the encoder in Pytorch numbers
+        )
 
-    input_ids = encoding_text['input_ids'].to(device) #Numeric input tokens and special tokens
-    attention_mask = encoding_text['attention_mask'].to(device) #Attention mask
+        input_ids = encoding_text['input_ids'].to(device) #Numeric input tokens and special tokens
+        attention_mask = encoding_text['attention_mask'].to(device) #Attention mask
 
-    #Model outputs are computed
-    outputs = model(input_ids = input_ids, attention_mask = attention_mask)
-    #Predictions are calculated. Maximum of 2 outputs is taken
-    #If first one is the maximum, suicide, if second one is the maximum, non-suicide
-    _, preds = torch.max(outputs, dim = 1)
+        #Model outputs are computed
+        outputs = model(input_ids = input_ids, attention_mask = attention_mask)
+        #Predictions are calculated. Maximum of 2 outputs is taken
+        #If first one is the maximum, suicide, if second one is the maximum, non-suicide
+        _, preds = torch.max(outputs, dim = 1)
 
-    if preds:
-        print("Clasificación: Suicide")
-    else:
-        print("Clasificación: Non-Suicide")
+        if preds:
+            print("Clasificación: Suicide")
+        else:
+            print("Clasificación: Non-Suicide")
 
 
 def customize_parameter_configuration(configuration_main):
