@@ -115,7 +115,7 @@ def option_menu():
     fourth_option_message_markdown = Markdown(fourth_option_message)
     console.print(fourth_option_message_markdown, style="bold")
 
-    fifth_option_message = """5. Personalizar ruta dataset"""
+    fifth_option_message = """5. Personalizar fichero dataset"""
     fifth_option_message_markdown = Markdown(fifth_option_message)
     console.print(fifth_option_message_markdown, style="bold")
 
@@ -222,7 +222,7 @@ def help_menu():
 
     #Design and printing of the explanatory message menu option 5
     fifth_option_table = Table(expand = True)
-    fifth_option_table.add_column("[option]OPCIÓN 5[/option] Personalizar ruta dataset", justify = "full")
+    fifth_option_table.add_column("[option]OPCIÓN 5[/option] Personalizar fichero dataset", justify = "full")
     fifth_option_table.add_row(
     """En esta opción el usuario puede cambiar la ruta predefinida del dataset para utilizar uno configurado por el usuario pero que esté situado en el mismo directorio destinado a datasets de la aplicación.\n"""
     + """\n""" +
@@ -254,7 +254,7 @@ def help_menu():
     seventh_option_table = Table(expand = True)
     seventh_option_table.add_column("[option]OPCIÓN 7[/option] Salir", justify = "full")
     seventh_option_table.add_row(
-    """Con está opción finaliza la ejecución de la aplicación.\n"""
+    """Con esta opción finaliza la ejecución de la aplicación.\n"""
     + """\n""" +
     """Los modelos entrenados persistirán al apagado de la aplicación pero no los cambios realizados en la configuración de entrenamiento."""
     )
