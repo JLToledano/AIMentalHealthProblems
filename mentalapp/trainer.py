@@ -5,6 +5,8 @@ import time
 
 from torch import nn
 from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, f1_score
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from TUI_menu import metrics_menu
 
@@ -37,6 +39,9 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     :type: Float64
     """
 
+    #Customization of the console
+    console = Console()
+    
     #The model is put into training mode
     model = model.train()
     #To store value of error in each iteration
@@ -47,38 +52,46 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     #Start of training time
     start_time_training = time.time()
 
-    for batch in data_loader:
-        #Inputs_ids are extracted from batch data and sent to GPU to speed up training
-        input_ids = batch['input_ids'].to(device)
-        #Attention mask is extracted from batch data and sent to GPU to speed up training
-        attention_mask = batch['attention_mask'].to(device)
-        #Labels are extracted from batch data and sent to GPU to speed up training
-        labels = batch['text_clasification'].to(device)
-        #Model outputs are computed
-        outputs = model(input_ids = input_ids, attention_mask = attention_mask)
-        #Predictions are calculated (in this case or performed by BERT).Maximum of 2 outputs is taken
-        #If first one is the maximum, suicide, if second one is the maximum, non-suicide
-        _, preds = torch.max(outputs, dim = 1)
+    #Space in which personalised progress bars exist
+    with Progress(SpinnerColumn(spinner_name='bouncingBall'), TextColumn("[progress.description]{task.description}"), BarColumn(), TextColumn("{task.percentage}%")) as progress:
+        #The training progress bar is created
+        task_training = progress.add_task("Entrenando...", total=len(data_loader))
 
-        #Error calculation
-        loss = loss_fn(outputs, labels)
-        #Calculation of successes. Accumulated sum of the predictions equals original labels
-        correct_predictions += torch.sum(preds == labels)
-        #Error made is added to error list
-        losses.append(loss.item())
+        for batch in data_loader:
+            #Inputs_ids are extracted from batch data and sent to GPU to speed up training
+            input_ids = batch['input_ids'].to(device)
+            #Attention mask is extracted from batch data and sent to GPU to speed up training
+            attention_mask = batch['attention_mask'].to(device)
+            #Labels are extracted from batch data and sent to GPU to speed up training
+            labels = batch['text_clasification'].to(device)
+            #Model outputs are computed
+            outputs = model(input_ids = input_ids, attention_mask = attention_mask)
+            #Predictions are calculated (in this case or performed by BERT).Maximum of 2 outputs is taken
+            #If first one is the maximum, suicide, if second one is the maximum, non-suicide
+            _, preds = torch.max(outputs, dim = 1)
 
-        #Error is back-propagated
-        loss.backward()
-        #Gradient is prevented from increasing too much so as not to slow down progress of training with excessively large jumps
-        #Gradient value is always kept between -1 and 1.
-        nn.utils.clip_grad_norm_(model.parameters(), max_norm = 1.0)
+            #Error calculation
+            loss = loss_fn(outputs, labels)
+            #Calculation of successes. Accumulated sum of the predictions equals original labels
+            correct_predictions += torch.sum(preds == labels)
+            #Error made is added to error list
+            losses.append(loss.item())
 
-        #Optimizer (weights) is updated.
-        optimizer.step()
-        #Training rate is updated
-        scheduler.step()
-        #Gradients are reset for next iteration
-        optimizer.zero_grad()
+            #Error is back-propagated
+            loss.backward()
+            #Gradient is prevented from increasing too much so as not to slow down progress of training with excessively large jumps
+            #Gradient value is always kept between -1 and 1.
+            nn.utils.clip_grad_norm_(model.parameters(), max_norm = 1.0)
+
+            #Optimizer (weights) is updated.
+            optimizer.step()
+            #Training rate is updated
+            scheduler.step()
+            #Gradients are reset for next iteration
+            optimizer.zero_grad()
+
+            #The training progress bar is updated
+            progress.update(task_training, advance=1)
 
     #End of training time
     end_time_training = time.time()
