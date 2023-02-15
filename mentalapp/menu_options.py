@@ -1,12 +1,14 @@
 import os
 import pathlib
-import numpy
 import torch
+
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from rich.prompt import Prompt, IntPrompt, FloatPrompt
+from rich.console import Console
+from rich.theme import Theme
 from rich.prompt import Confirm
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
@@ -21,14 +23,17 @@ def save_model(model):
     """
 
     name_with_blank_spaces = True
+    
+    custom_theme = Theme({"error": "red", "required_parameter":"purple"})
+    console = Console(theme = custom_theme)
 
     #If file name specified by user contains blanks, another name is requested
     while name_with_blank_spaces:
-        model_name = input("Escoja un nombre para el modelo: ")
+        model_name = Prompt.ask("Escoja un nombre para el modelo: ")
 
         if " " in model_name:
             name_with_blank_spaces = True
-            print("No se recomienda el uso de espacios en un nombre de fichero")
+            console.print("[error]No se recomienda[/error] el uso de espacios en un [required_parameter]nombre de fichero[/required_parameter]\n")
         else:
              name_with_blank_spaces = False
 
@@ -50,34 +55,37 @@ def load_model():
     number_file = 0
     selected_file = False
 
+    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    console = Console(theme = custom_theme)
+
     #The directory where models are located is established
     path_models = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
     address = pathlib.Path(path_models)
 
     #If model directory is empty, user is prompted to train one first
     if len(os.listdir(address)) == 0:
-        print("No existen modelos actualmente. Por favor entrene uno para poder evaluarlo o utilizarlo")
+        console.print("[error]No existen modelos actualmente.[/error] Por favor [required_parameter]entrene uno[/required_parameter] para poder [option]evaluarlo[/option] o [option]utilizarlo[/option]\n")
         model = None
     #If trained models exist, they are listed for user to choose one of them
     else:
-        print("Ficheros disponibles:")
+        console.print("Ficheros disponibles:", style="bold")
 
         #Each file available in directory is printed and added to list
         for file in address.iterdir():
             number_file += 1
             list_pretraining_models.append(file.name)
-            print("    " + str(number_file) + ". " + file.name)
+            console.print("    " + "[option]" + str(number_file) + "[/option]" + ". " + file.name)
 
         #User is asked to choose a pre-trained model and is not stopped until a valid one is chosen
         while not selected_file:
             try:
-                number_file = int(input("Seleccione el número del modelo que desea: "))
+                number_file = IntPrompt.ask("Seleccione el número del modelo que desea")
                 name_file = list_pretraining_models[number_file - 1]
                 #Torch model is loaded
                 model = torch.load(os.path.join(path_models, name_file))
                 selected_file = True
             except:
-                print("Número de fichero no válido")
+                console.print("Número de [error]fichero no válido[/error]\n")
 
     return model
 
@@ -205,6 +213,8 @@ def use_classify_model(configuration_main, device):
     :return: Nothing
     """
 
+    console = Console()
+
     #Pre-trained Torch model is loaded
     model = load_model()
 
@@ -214,7 +224,7 @@ def use_classify_model(configuration_main, device):
         tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
         #User mesagge
-        text = input("Inserte el texto que quiere clasificar:\n")
+        text = console.input("Inserte el texto que quiere clasificar:\n", style="bold")
 
         #Coding of input data
         encoding_text = tokenizer.encode_plus(
