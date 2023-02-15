@@ -9,6 +9,7 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.theme import Theme
 from rich.table import Table
+from rich.table import Column
 
 def clear_console():
     """
@@ -265,3 +266,75 @@ def help_menu():
 
     #The console is cleared after entire help menu has been displayed
     clear_console()
+
+
+def metrics_menu(confusion_matrix, accurancy, recall, precision, f1):
+    """
+    Function that prints out the results of the metrics from a training or an evaluation
+    :param confusion_matrix: Confusion matrix result value
+    :type: Array[Array[Int]]
+    :param accurancy: Accurancy result value
+    :type: Float
+    :param recall: Recall result value
+    :type: Float
+    :param precision: Precision result value
+    :type: Float
+    :param f1: F1 result value
+    :type: Float
+    """
+
+    #Customization of the console with special predefined styles
+    custom_theme = Theme({"parameter":"purple"})
+    console = Console(theme = custom_theme)
+
+    #Section header design
+    section_title_message = """RESULTADOS MEDIDAS"""
+    section_title_message_align = Align(section_title_message, align="center")
+    console.print(Panel(section_title_message_align, style="bold"))
+
+    #Confusion Matrix parts
+    true_negative_panel = Panel(Align("[parameter]TN[/parameter] " + str(confusion_matrix[0][0]), align="center"), title="True Negative")
+    false_positive_panel = Panel(Align("[parameter]FP[/parameter] " + str(confusion_matrix[0][1]), align="center"), title="False Positive")
+    false_negative_panel = Panel(Align("[parameter]FN[/parameter] " + str(confusion_matrix[1][0]), align="center"), title="False Negative")
+    true_positive_panel = Panel(Align("[parameter]TP[/parameter] " + str(confusion_matrix[1][1]), align="center"), title="True Positive")
+
+    #Accurancy panel
+    accurancy_panel = Panel(Align(str(accurancy), align="center"), title="Accurancy")
+
+    #Recall panel
+    recall_panel = Panel(Align(str(recall), align="center"), title="Recall")
+
+    #Precision panel
+    precision_panel = Panel(Align(str(precision), align="center"), title="Precision")
+
+    #F1 panel
+    f1_panel = Panel(Align(str(f1), align="center"), title="F1")
+
+    #General table design
+    measurements_table = Table(
+        Column(header="Matriz de Confusión", justify="center"),
+        Column(header="Otras Medidas", justify="center"),
+        expand=True
+    )
+
+    #Design of confusion matrix table (left side general table)
+    confusion_matrix_table = Table.grid(expand=True)
+    confusion_matrix_table.add_column(justify="center")
+    confusion_matrix_table.add_column(justify="center")
+    confusion_matrix_table.add_row(true_negative_panel,false_positive_panel)
+    confusion_matrix_table.add_row(false_negative_panel,true_positive_panel)
+
+    #Design of table of other measurements (right side of general table)
+    other_measurements_table = Table.grid(expand=True)
+    other_measurements_table.add_column(justify="center")
+    other_measurements_table.add_column(justify="center")
+    other_measurements_table.add_row(accurancy_panel,recall_panel)
+    other_measurements_table.add_row(precision_panel,f1_panel)
+
+    #Connection of subtables with the general table
+    measurements_table.add_row(confusion_matrix_table,other_measurements_table)
+
+    #The set of tables is printed
+    console.print(measurements_table)
+    console.print('\n')
+
