@@ -1,6 +1,7 @@
 """File defining the trainer and evaluator of a neural network model"""
 
 import torch
+import time
 
 from torch import nn
 from sklearn.metrics import confusion_matrix, accuracy_score, recall_score, precision_score, f1_score
@@ -42,6 +43,9 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     losses = []
     #Set initial training accuracy to 0
     correct_predictions = 0
+    
+    #Start of training time
+    start_time_training = time.time()
 
     for batch in data_loader:
         #Inputs_ids are extracted from batch data and sent to GPU to speed up training
@@ -76,8 +80,14 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
         #Gradients are reset for next iteration
         optimizer.zero_grad()
 
-        #Calculate the metrics required for the design study
-        metrics_model(labels, preds)
+    #End of training time
+    end_time_training = time.time()
+
+    #Total of training time
+    total_time_training = end_time_training - start_time_training
+
+    #Calculate the metrics required for the design study
+    metrics_model(labels, preds, total_time_training)
 
     return model, optimizer, scheduler
 
@@ -106,6 +116,9 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
     #Set initial evaluating accuracy to 0
     correct_predictions = 0
 
+    #Start of evaluating time
+    start_time_evaluating = time.time()
+
     #It is indicated that no model parameters should be modified
     with torch.no_grad():
         for batch in data_loader:
@@ -128,17 +141,25 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
             #Error made is added to error list
             losses.append(loss.item())
 
-            #Calculate the metrics required for the design study
-            metrics_model(labels, preds)
+        #End of evaluating time
+        end_time_evaluating = time.time()
+
+        #Total of evaluating time
+        total_time_evaluating = end_time_evaluating - start_time_evaluating
+
+        #Calculate the metrics required for the design study
+        metrics_model(labels, preds, total_time_evaluating)
 
 
-def metrics_model(labels, predictions):
+def metrics_model(labels, predictions, execution_time):
     """
     Calculates the metrics necessary for testing the performance and evolution of neural model
     :param labels: Original data classification labels
     :type: Tensor
     :param predictions: Data classification labels predicted by the model
     :type: Tensor
+    :param execution_time: Execution training or evaluation time
+    :type: Float
     :return: Nothing
     """
 
@@ -165,4 +186,4 @@ def metrics_model(labels, predictions):
     f1 = f1_score(labels, predictions, average="binary", zero_division = 0)
 
     #Printout of template with results
-    metrics_menu(confusion, accurancy, recall, precision, f1)
+    metrics_menu(confusion, accurancy, recall, precision, f1, execution_time)

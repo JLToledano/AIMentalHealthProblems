@@ -268,7 +268,7 @@ def help_menu():
     clear_console()
 
 
-def metrics_menu(confusion_matrix, accurancy, recall, precision, f1):
+def metrics_menu(confusion_matrix, accurancy, recall, precision, f1, execution_time):
     """
     Function that prints out the results of the metrics from a training or an evaluation
     :param confusion_matrix: Confusion matrix result value
@@ -281,6 +281,9 @@ def metrics_menu(confusion_matrix, accurancy, recall, precision, f1):
     :type: Float
     :param f1: F1 result value
     :type: Float
+    :param execution_time: Execution training or evaluation time
+    :type: Float
+    :return: Nothing
     """
 
     #Customization of the console with special predefined styles
@@ -288,9 +291,14 @@ def metrics_menu(confusion_matrix, accurancy, recall, precision, f1):
     console = Console(theme = custom_theme)
 
     #Section header design
-    section_title_message = """RESULTADOS MEDIDAS"""
+    section_title_message = "RESULTADOS MEDIDAS"
     section_title_message_align = Align(section_title_message, align="center")
     console.print(Panel(section_title_message_align, style="bold"))
+
+    #Execution time panel
+    execution_time_message = "TIEMPO DE EJECUCIÓN: " + str(execution_time) + " segundos"
+    execution_time_message_align = Align(execution_time_message, align="left")
+    console.print(Panel(execution_time_message_align, style="bold"))
 
     #Confusion Matrix parts
     true_negative_panel = Panel(Align("[parameter]TN[/parameter] " + str(confusion_matrix[0][0]), align="center"), title="True Negative")
