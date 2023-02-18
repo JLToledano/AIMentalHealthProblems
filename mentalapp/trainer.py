@@ -122,6 +122,9 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
     :type: Tensor
     """
 
+    #Customization of the console
+    console = Console()
+
     #The model is put into evaluating mode
     model = model.eval()
     #To store value of error in each iteration
@@ -132,36 +135,44 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
     #Start of evaluating time
     start_time_evaluating = time.time()
 
-    #It is indicated that no model parameters should be modified
-    with torch.no_grad():
-        for batch in data_loader:
-            #Inputs_ids are extracted from batch data and sent to GPU to speed up evaluation
-            input_ids = batch['input_ids'].to(device)
-            #Attention mask is extracted from batch data and sent to GPU to speed up evaluation
-            attention_mask = batch['attention_mask'].to(device)
-            #Labels are extracted from batch data and sent to GPU to speed up evaluation
-            labels = batch['text_clasification'].to(device)
-            #Model outputs are computed
-            outputs = model(input_ids = input_ids, attention_mask = attention_mask)
-            #Predictions are calculated (in this case or performed by BERT).Maximum of 2 outputs is taken
-            #If first one is the maximum, suicide, if second one is the maximum, non-suicide.
-            _, preds = torch.max(outputs, dim = 1)
+    #Space in which personalised progress bars exist
+    with Progress(SpinnerColumn(spinner_name='bouncingBall'), TextColumn("[progress.description]{task.description}"), BarColumn(), TextColumn("{task.percentage}%")) as progress:
+        #The evaluating progress bar is created
+        task_evaluating = progress.add_task("Evaluando...", total=len(data_loader))
 
-            #Error calculation
-            loss = loss_fn(outputs, labels)
-            #Calculation of successes. Accumulated sum of the predictions equals original labels
-            correct_predictions += torch.sum(preds == labels)
-            #Error made is added to error list
-            losses.append(loss.item())
+        #It is indicated that no model parameters should be modified
+        with torch.no_grad():
+            for batch in data_loader:
+                #Inputs_ids are extracted from batch data and sent to GPU to speed up evaluation
+                input_ids = batch['input_ids'].to(device)
+                #Attention mask is extracted from batch data and sent to GPU to speed up evaluation
+                attention_mask = batch['attention_mask'].to(device)
+                #Labels are extracted from batch data and sent to GPU to speed up evaluation
+                labels = batch['text_clasification'].to(device)
+                #Model outputs are computed
+                outputs = model(input_ids = input_ids, attention_mask = attention_mask)
+                #Predictions are calculated (in this case or performed by BERT).Maximum of 2 outputs is taken
+                #If first one is the maximum, suicide, if second one is the maximum, non-suicide.
+                _, preds = torch.max(outputs, dim = 1)
 
-        #End of evaluating time
-        end_time_evaluating = time.time()
+                #Error calculation
+                loss = loss_fn(outputs, labels)
+                #Calculation of successes. Accumulated sum of the predictions equals original labels
+                correct_predictions += torch.sum(preds == labels)
+                #Error made is added to error list
+                losses.append(loss.item())
 
-        #Total of evaluating time
-        total_time_evaluating = end_time_evaluating - start_time_evaluating
+                #The evaluating progress bar is updated
+                progress.update(task_evaluating, advance=1)
 
-        #Calculate the metrics required for the design study
-        metrics_model(labels, preds, total_time_evaluating)
+    #End of evaluating time
+    end_time_evaluating = time.time()
+
+    #Total of evaluating time
+    total_time_evaluating = end_time_evaluating - start_time_evaluating
+
+    #Calculate the metrics required for the design study
+    metrics_model(labels, preds, total_time_evaluating)
 
 
 def metrics_model(labels, predictions, execution_time):
