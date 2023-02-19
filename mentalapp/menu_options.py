@@ -143,9 +143,6 @@ def training_model_scratch(configuration_main, device, train_dataset):
     #Total number of training iterations
     total_steps = len(train_data_loader) * configuration_main['EPOCHS']
 
-    #Total number of training data
-    number_train_data = len(train_dataset)
-
     #Function to reduce the learning rate
     scheduler = get_linear_schedule_with_warmup(
         optimizer, #Optimizer function
@@ -163,7 +160,7 @@ def training_model_scratch(configuration_main, device, train_dataset):
 
         #Model training and parameter update
         model, optimizer, scheduler = train_model(
-            model, train_data_loader, loss_fn, optimizer, device, scheduler, number_train_data
+            model, train_data_loader, loss_fn, optimizer, device, scheduler
         )
     
     #Trained model is stored
@@ -193,14 +190,8 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
         #Creation of Pytorch dataset for evaluating
         test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
 
-        #Total number of evaluating data
-        number_test_data = len(test_dataset)
-
-        #Error function to be minimized
-        loss_fn = nn.CrossEntropyLoss().to(device)
-        
         #Model validated
-        eval_model(model, test_data_loader, loss_fn, device, number_test_data)
+        eval_model(model, test_data_loader,device)
 
 
 def use_classify_model(configuration_main, device):
@@ -224,7 +215,7 @@ def use_classify_model(configuration_main, device):
         tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
         #User mesagge
-        text = console.input("Inserte el texto que quiere clasificar:\n", style="bold")
+        text = console.input("Inserte el texto que quiere clasificar:\n")
 
         #Coding of input data
         encoding_text = tokenizer.encode_plus(

@@ -10,7 +10,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from TUI_menu import metrics_menu
 
-def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, number_data):
+def train_model(model, data_loader, loss_fn, optimizer, device, scheduler):
     """
     Function that trains a complete model with input data and configurations provided
     :param model: Complete neural model
@@ -25,8 +25,6 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     :type: Device
     :param scheduler: Function to progressively reduce learning rate
     :type: LambdaLR
-    :param number_data: Number of training data
-    :type: Int
     :return: Trained model
     :type: MODELSentimentClassifier
     :return: Upgraded optimizer
@@ -44,10 +42,10 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     
     #The model is put into training mode
     model = model.train()
-    #To store value of error in each iteration
-    losses = []
-    #Set initial training accuracy to 0
-    correct_predictions = 0
+    #To store value of labels in each iteration
+    tensor_labels = torch.empty(0)
+    #To store value of predictions in each iteration
+    tensor_predictions = torch.empty(0)
     
     #Start of training time
     start_time_training = time.time()
@@ -70,15 +68,16 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
             #If first one is the maximum, suicide, if second one is the maximum, non-suicide
             _, preds = torch.max(outputs, dim = 1)
 
+            #Labels is added to labels tensor
+            tensor_labels = torch.cat((tensor_labels,labels))
+            #Predictions made is added to predictions tensor
+            tensor_predictions = torch.cat((tensor_predictions,preds))
+
             #Error calculation
             loss = loss_fn(outputs, labels)
-            #Calculation of successes. Accumulated sum of the predictions equals original labels
-            correct_predictions += torch.sum(preds == labels)
-            #Error made is added to error list
-            losses.append(loss.item())
-
             #Error is back-propagated
             loss.backward()
+
             #Gradient is prevented from increasing too much so as not to slow down progress of training with excessively large jumps
             #Gradient value is always kept between -1 and 1.
             nn.utils.clip_grad_norm_(model.parameters(), max_norm = 1.0)
@@ -100,24 +99,20 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, numbe
     total_time_training = end_time_training - start_time_training
 
     #Calculate the metrics required for the design study
-    metrics_model(labels, preds, total_time_training)
+    metrics_model(tensor_labels, tensor_predictions, total_time_training)
 
     return model, optimizer, scheduler
 
 
-def eval_model(model, data_loader, loss_fn, device, number_data):
+def eval_model(model, data_loader,device):
     """
     Function that evaluating a complete model with input data and configurations provided
     :param model: Complete neural model
     :type: MODELSentimentClassifier
     :param data_loader: Function that loads training data
     :type: DataLoader
-    :param loss_fn: Error function
-    :type: CrossEntropyLoss
     :param device: GPU used if available
     :type: Device
-    :param number_data: Number of training data
-    :type: Int
     :return: Training accuracy
     :type: Tensor
     """
@@ -127,10 +122,10 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
 
     #The model is put into evaluating mode
     model = model.eval()
-    #To store value of error in each iteration
-    losses = []
-    #Set initial evaluating accuracy to 0
-    correct_predictions = 0
+    #To store value of labels in each iteration
+    tensor_labels = torch.empty(0)
+    #To store value of predictions in each iteration
+    tensor_predictions = torch.empty(0)
 
     #Start of evaluating time
     start_time_evaluating = time.time()
@@ -155,12 +150,10 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
                 #If first one is the maximum, suicide, if second one is the maximum, non-suicide.
                 _, preds = torch.max(outputs, dim = 1)
 
-                #Error calculation
-                loss = loss_fn(outputs, labels)
-                #Calculation of successes. Accumulated sum of the predictions equals original labels
-                correct_predictions += torch.sum(preds == labels)
-                #Error made is added to error list
-                losses.append(loss.item())
+                #Labels is added to labels tensor
+                tensor_labels = torch.cat((tensor_labels,labels))
+                #Predictions made is added to predictions tensor
+                tensor_predictions = torch.cat((tensor_predictions,preds))
 
                 #The evaluating progress bar is updated
                 progress.update(task_evaluating, advance=1)
@@ -172,7 +165,7 @@ def eval_model(model, data_loader, loss_fn, device, number_data):
     total_time_evaluating = end_time_evaluating - start_time_evaluating
 
     #Calculate the metrics required for the design study
-    metrics_model(labels, preds, total_time_evaluating)
+    metrics_model(tensor_labels, tensor_predictions, total_time_evaluating)
 
 
 def metrics_model(labels, predictions, execution_time):
