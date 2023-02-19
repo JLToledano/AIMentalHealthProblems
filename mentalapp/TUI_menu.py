@@ -8,8 +8,9 @@ from rich.markdown import Markdown
 from rich.align import Align
 from rich.panel import Panel
 from rich.theme import Theme
-from rich.table import Table
-from rich.table import Column
+from rich.table import Table, Column
+from rich.prompt import Prompt, IntPrompt, FloatPrompt
+from rich.tree import Tree
 
 def clear_console():
     """
@@ -346,3 +347,152 @@ def metrics_menu(confusion_matrix, accurancy, recall, precision, f1, execution_t
     console.print(measurements_table)
     console.print('\n')
 
+
+def models_menu(list_models_files):
+    """
+    Function that simulates a pagination of the list of models and allows the user to select one of them 
+    for use or evaluation
+    :param list_models_files: List of all available model files
+    :type: List[String]
+    :return: Name of selected file
+    :type: String
+    """
+
+    custom_theme = Theme({"error": "red", "range":"yellow", "index":"purple"})
+    console = Console(theme = custom_theme)
+
+    #User is asked how many files he/she wants for each directory in the "paging"
+    dir_number_files = IntPrompt.ask("Por favor indique el número de ficheros por directorio", default=25)
+
+    #Resulting number of directories is calculated
+    number_dirs = len(list_models_files) // dir_number_files
+    #If you select more files per directory than available files, at least one directory with all files is set to be available
+    #Or if division is not exact, one more directory is added 
+    if number_dirs == 0 or (len(list_models_files) % dir_number_files):
+        number_dirs += 1
+
+    #Instance of the directory tree
+    dir_tree = Tree("Directorios")
+
+    #For each directory
+    for i in range(1, number_dirs + 1):
+        #If we are in last directory, it loads from corresponding file to last one
+        #It may be that the number of files is not an exact multiple of the dividing number
+        if i == number_dirs:
+            #Directory name is composed
+            title_dir = "[index]" + str(i) + "[/index]" + ". " + "Ficheros del " + "[range]" + str((i - 1) * dir_number_files + 1) + "[/range]" + " al " + "[range]" + str(len(list_models_files)) + "[/range]"
+
+        else:
+            #Directory name is composed
+            title_dir = "[index]" + str(i) + "[/index]" + ". " + "Ficheros del " + "[range]" + str((i - 1) * dir_number_files + 1) + "[/range]" + " al " + "[range]" + str(i * dir_number_files) + "[/range]"
+
+        #Directory is added to the directory tree
+        dir_tree.add(title_dir)
+
+    #Directory tree is printed
+    console.print(dir_tree)
+    console.print("\n")
+
+    selected_file = False
+
+    #As long as no file has been selected
+    while not selected_file:
+        #Instance of the directory tree
+        dir_tree = Tree("Directorios")
+
+        #User is asked if he/she wants to display directory or select file
+        selection = Prompt.ask("¿Qué desea seleccionar?", choices=["directorio", "fichero"])
+
+        #If he/she wants to display a directory
+        if selection == "directorio":
+            #User is asked which directory to display
+            number_dir_displayed = IntPrompt.ask("Por favor indique el número de directorio a desplegar", default=1)
+
+            #If user has chosen an existing directory
+            if 1 <= number_dir_displayed <= number_dirs:
+                #Directory tree is composed with existing directories and chosen directory displayed
+                for i in range(1, number_dirs + 1):
+                    #If we are in last directory, it loads from corresponding file to last one
+                    #It may be that the number of files is not an exact multiple of the dividing number
+                    if i == number_dirs:
+                        #Directory name is composed
+                        title_dir = "[index]" + str(i) + "[/index]" + ". " + "Ficheros del " + "[range]" + str((i - 1) * dir_number_files + 1) + "[/range]" + " al " + "[range]" + str(len(list_models_files)) + "[/range]"
+                        #If it is the directory chosen to deploy it
+                        if i == number_dir_displayed:
+                            #Position in list of first file belonging to this directory is set
+                            minimum_of_range = (i - 1) * dir_number_files
+                            #Position in list of last file belonging to this directory is set
+                            #As last directory, it is last file in list
+                            maximum_of_range = len(list_models_files)
+
+                    else:
+                        #Directory name is composed
+                        title_dir = "[index]" + str(i) + "[/index]" + ". " + "Ficheros del " + "[range]" + str((i - 1) * dir_number_files + 1) + "[/range]" + " al " + "[range]" + str(i * dir_number_files) + "[/range]"
+                        #If it is the directory chosen to deploy it
+                        if i == number_dir_displayed:
+                            #Position in list of first file belonging to this directory is set
+                            minimum_of_range = (i - 1) * dir_number_files
+                            #Position in list of last file belonging to this directory is set
+                            maximum_of_range = i * dir_number_files
+
+                    #If it is the directory chosen to deploy it
+                    if i == number_dir_displayed:
+                        #If there is only one file in directory, maximum range is increased by one 
+                        #because in Python if minimum and maximum range coincide an empty list is returned
+                        if minimum_of_range == maximum_of_range:
+                            maximum_of_range += 1
+
+                        #Files that belong to directory to be deployed are obtained
+                        list_print_files = list_models_files[minimum_of_range:maximum_of_range]
+
+                        #Directory is added to the directory tree
+                        displayed_branch = dir_tree.add(title_dir)
+
+                        #Ratio of files to total number of files in list
+                        number_file = (i - 1) * dir_number_files + 1
+
+                        #For each file belonging to directory
+                        for file in list_print_files:
+                            #File name is composed
+                            title_file = "[index]" + str(number_file) + "[/index]" + ". " + file
+                            #File is added to the displayed directory tree
+                            displayed_branch.add(title_file)
+
+                            #File index is increased
+                            number_file += 1
+
+                    #If it is not the directory chosen to deploy it
+                    else:
+                        dir_tree.add(title_dir)
+
+                #Directory tree is printed
+                console.print(dir_tree)
+                console.print("\n")
+
+            #If user has chosen a directory that does not exist
+            else:
+                console.print("Número de [error]directorio no válido[/error]\n")
+
+        #If he/she wants to select a file
+        else:
+            #User is asked which directory to select
+            file_position = IntPrompt.ask("Por favor indique el número de fichero que desea seleccionar", default=1)
+
+            #If position of chosen file exists, file name is obtained and returned
+            try:
+                #This filter is performed because the position 0 - 1 (-1) in Python returns last value in list
+                if file_position == 0:
+                    console.print("Número de [error]fichero no válido[/error]\n")
+
+                else:
+                    #File name is obtained
+                    file_name = list_models_files[file_position - 1]
+
+                    #It indicates that a valid file has already been selected
+                    selected_file = True
+            
+            #If file position does not exist, it indicates that selection is invalid
+            except:
+                console.print("Número de [error]fichero no válido[/error]\n")
+
+    return file_name

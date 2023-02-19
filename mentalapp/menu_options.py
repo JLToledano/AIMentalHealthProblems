@@ -13,6 +13,7 @@ from rich.prompt import Confirm
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
+from TUI_menu import models_menu
 
 def save_model(model):
     """
@@ -35,7 +36,7 @@ def save_model(model):
             name_with_blank_spaces = True
             console.print("[error]No se recomienda[/error] el uso de espacios en un [required_parameter]nombre de fichero[/required_parameter]\n")
         else:
-             name_with_blank_spaces = False
+            name_with_blank_spaces = False
 
     #The file path is set
     model_path = "models\{}.pt".format(model_name)
@@ -51,10 +52,6 @@ def load_model():
     :type: MODELSentimentClassifier
     """
 
-    list_pretraining_models = []
-    number_file = 0
-    selected_file = False
-
     custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
@@ -66,26 +63,17 @@ def load_model():
     if len(os.listdir(address)) == 0:
         console.print("[error]No existen modelos actualmente.[/error] Por favor [required_parameter]entrene uno[/required_parameter] para poder [option]evaluarlo[/option] o [option]utilizarlo[/option]\n")
         model = None
+
     #If trained models exist, they are listed for user to choose one of them
     else:
-        console.print("Ficheros disponibles:", style="bold")
+        #Available model files are obtained
+        list_models_files = os.listdir(address)
+        
+        #Select the name of one of the models
+        name_file = models_menu(list_models_files)
 
-        #Each file available in directory is printed and added to list
-        for file in address.iterdir():
-            number_file += 1
-            list_pretraining_models.append(file.name)
-            console.print("    " + "[option]" + str(number_file) + "[/option]" + ". " + file.name)
-
-        #User is asked to choose a pre-trained model and is not stopped until a valid one is chosen
-        while not selected_file:
-            try:
-                number_file = IntPrompt.ask("Seleccione el número del modelo que desea")
-                name_file = list_pretraining_models[number_file - 1]
-                #Torch model is loaded
-                model = torch.load(os.path.join(path_models, name_file))
-                selected_file = True
-            except:
-                console.print("Número de [error]fichero no válido[/error]\n")
+        #Selected model is loaded
+        model = torch.load(os.path.join(path_models, name_file))
 
     return model
 
