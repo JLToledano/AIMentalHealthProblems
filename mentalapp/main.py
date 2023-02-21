@@ -11,7 +11,7 @@ from rich.theme import Theme
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from TUI_menu import option_menu, welcome_menu
+from TUI_menu import option_menu, welcome_menu, help_menu
 from mod_dataset.dataset import Dataset
 from menu_options import *
 
@@ -46,30 +46,6 @@ def dataset_initialize():
     test_dataset.format_dataset(test_raw_data)
 
     return complete_dataset, train_dataset, test_dataset
-
-
-def data_loader(dataset,tokenizer,max_len,batch_size,num_workers):
-    """
-    Adding the necessary structure to the dataset to adapt it to Pytorch
-    :param dataset: Generic dataset with data
-    :type: Dataset
-    :param tokenizer: Function that transforms input data into special codes (tokens)
-    :type: Tokenizer
-    :param max_len: Maximum number of words accepted by model as input parameter
-    :type: Int
-    :param batch_size: Lot size. Number of data to be inserted into neural network at a time
-    :type: Int
-    :param num_workers: Number of processes running in parallel. Analyzes x data in parallel
-    :type: Int
-    :return: Custom Pytorch dataset
-    :type: DataLoader
-    """
-
-    dataset.set_tokenizer(tokenizer)
-    dataset.set_max_len(max_len)
-
-    #Pytorch-specific DataLoader is created
-    return DataLoader(dataset, batch_size=batch_size, num_workers=num_workers)
 
 
 def main():
