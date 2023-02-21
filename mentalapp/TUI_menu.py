@@ -438,8 +438,9 @@ def models_menu(list_models_files):
 
             #If position of chosen file exists, file name is obtained and returned
             try:
-                #This filter is performed because the position 0 - 1 (-1) in Python returns last value in list
-                if file_position == 0:
+                #This filter is performed because the position 0 - 1 (-1) in Python returns last value in list. 
+                #In addition, negative values are not valid
+                if file_position <= 0:
                     console.print("Número de [error]fichero no válido[/error]\n")
 
                 else:
