@@ -115,7 +115,7 @@ def training_model_scratch(configuration_main, device, train_dataset):
     :return: Nothing
     """
     #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
 
     #Creation of Pytorch dataset for training
     train_data_loader = data_loader(train_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
@@ -174,7 +174,7 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
     #If it has been possible to select a model, text is requested and sorted
     if model is not None:
         #Function transforming input data into special codes (tokens) for BERT model
-        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
 
         #Creation of Pytorch dataset for evaluating
         test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
@@ -201,7 +201,7 @@ def use_classify_model(configuration_main, device):
     #If it has been possible to select a model, text is requested and sorted
     if model is not None:
         #Function transforming input data into special codes (tokens) for BERT model
-        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
+        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
 
         #User mesagge
         text = console.input("Inserte el texto que quiere clasificar en inglés:\n")
