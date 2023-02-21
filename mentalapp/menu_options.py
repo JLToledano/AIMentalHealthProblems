@@ -66,8 +66,9 @@ def load_model():
 
     #If trained models exist, they are listed for user to choose one of them
     else:
-        #Available model files are obtained
+        #Available model files are obtained and sorted
         list_models_files = os.listdir(address)
+        list_models_files.sort()
         
         #Select the name of one of the models
         name_file = models_menu(list_models_files)
@@ -203,7 +204,7 @@ def use_classify_model(configuration_main, device):
         tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
         #User mesagge
-        text = console.input("Inserte el texto que quiere clasificar:\n")
+        text = console.input("Inserte el texto que quiere clasificar en inglés:\n")
 
         #Coding of input data
         encoding_text = tokenizer.encode_plus(
@@ -227,9 +228,9 @@ def use_classify_model(configuration_main, device):
         _, preds = torch.max(outputs, dim = 1)
 
         if preds:
-            print("Clasificación: Suicide")
+            print("\nClasificación: Suicide\n")
         else:
-            print("Clasificación: Non-Suicide")
+            print("\nClasificación: Non-Suicide\n")
 
 
 def customize_parameter_configuration(configuration_main):
