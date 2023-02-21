@@ -104,7 +104,7 @@ def main():
     while selected_option != "7":
         option_menu()
 
-        custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+        custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
         console = Console(theme = custom_theme)
         selected_option = Prompt.ask("Seleccione una opción")
         console.print(Panel.fit("Opción: " + selected_option))
@@ -129,13 +129,13 @@ def main():
 
                             exec(menu_options[selected_option])
             except:
-                console.print("[error]No se ha podido ejecutar[/error] la opción elegida, por favor compruebe la configuración elegida e [success]inténtelo de nuevo[/success]")
+                console.print("[error]No se ha podido ejecutar[/error] la opción elegida, por favor compruebe la configuración elegida e [success]inténtelo de nuevo[/success].")
 
         else:
             if selected_option == '7':
                 pass
             else:
-                console.print("[error] Opción incorrecta [/error], por favor selecione una de las [success] opciones disponibles [/success]")
+                console.print("[error]Opción incorrecta[/error], por favor selecione una de las [success]opciones disponibles[/success].")
                 print("")
 
 

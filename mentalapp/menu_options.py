@@ -25,7 +25,7 @@ def save_model(model):
 
     name_with_blank_spaces = True
     
-    custom_theme = Theme({"error": "red", "required_parameter":"purple"})
+    custom_theme = Theme({"error":"red", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #If file name specified by user contains blanks, another name is requested
@@ -52,7 +52,7 @@ def load_model():
     :type: MODELSentimentClassifier
     """
 
-    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #The directory where models are located is established

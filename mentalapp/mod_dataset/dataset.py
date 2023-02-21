@@ -52,6 +52,7 @@ class Dataset:
         :type: list[dict[String:String]]
         :return: Nothing
         """
+
         self.__dataset = list(map(lambda line: message(line), list_data))
 
 
@@ -63,6 +64,7 @@ class Dataset:
         """
 
         return len(self.__dataset)
+
 
     def __getitem__(self, item):
         """
@@ -106,6 +108,7 @@ class Dataset:
         """
 
         self.__tokenizer = tokenizer
+
 
     def set_max_len(self,max_len):
         """

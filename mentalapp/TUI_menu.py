@@ -124,7 +124,7 @@ def help_menu():
     """
     
     #Customization of the console with special predefined styles
-    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #Design and printing of welcome message
@@ -169,10 +169,10 @@ def help_menu():
 
     #Design and printing of the explanatory message menu option 4
     fourth_option_table_parameters = Table(box = box.HEAVY)
-    fourth_option_table_parameters.add_column("Parameter", justify = "center")
-    fourth_option_table_parameters.add_column("Default value", justify = "center")
-    fourth_option_table_parameters.add_column("Definition", justify = "full")
-    fourth_option_table_parameters.add_column("Considerations", justify = "center")
+    fourth_option_table_parameters.add_column("Parámetro", justify = "center")
+    fourth_option_table_parameters.add_column("Valor por defecto", justify = "center")
+    fourth_option_table_parameters.add_column("Definición", justify = "full")
+    fourth_option_table_parameters.add_column("Consideraciones", justify = "center")
     
     fourth_option_table_parameters.add_row("MAX_DATA_LEN", "200", "Número de palabras máximo que admite el modelo neuronal. El resto de palabras se truncan", "")
     fourth_option_table_parameters.add_row("BATCH_SIZE", "16", "Tamaño de lote. Número de datos que se insertan en la red neuronal cada vez", "")
@@ -316,7 +316,7 @@ def models_menu(list_models_files):
     :type: String
     """
 
-    custom_theme = Theme({"error": "red", "range":"yellow", "index":"purple"})
+    custom_theme = Theme({"error":"red", "range":"yellow", "index":"purple"})
     console = Console(theme = custom_theme)
 
     #User is asked how many files he/she wants for each directory in the "paging"
