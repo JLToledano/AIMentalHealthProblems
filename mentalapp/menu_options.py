@@ -39,7 +39,7 @@ def save_model(model):
             name_with_blank_spaces = False
 
     #The file path is set
-    model_path = "models\{}.pt".format(model_name)
+    model_path = pathlib.Path("models", model_name + ".pt")
 
     #Torch model is stored in selected path
     torch.save(model,os.path.join(os.path.dirname(os.path.abspath(__file__)), model_path))
