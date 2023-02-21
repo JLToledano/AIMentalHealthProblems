@@ -135,7 +135,7 @@ def main():
             if selected_option == '7':
                 pass
             else:
-                console.print("[error]Opción incorrecta[/error], por favor selecione una de las [success]opciones disponibles[/success].")
+                console.print("[error]Opción incorrecta[/error], por favor seleccione una de las [success]opciones disponibles[/success].")
                 print("")
 
 
