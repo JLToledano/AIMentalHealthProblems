@@ -25,7 +25,7 @@ def save_model(model):
 
     name_with_blank_spaces = True
     
-    custom_theme = Theme({"error": "red", "required_parameter":"purple"})
+    custom_theme = Theme({"error":"red", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #If file name specified by user contains blanks, another name is requested
@@ -39,7 +39,7 @@ def save_model(model):
             name_with_blank_spaces = False
 
     #The file path is set
-    model_path = "models\{}.pt".format(model_name)
+    model_path = pathlib.Path("models", model_name + ".pt")
 
     #Torch model is stored in selected path
     torch.save(model,os.path.join(os.path.dirname(os.path.abspath(__file__)), model_path))
@@ -52,7 +52,7 @@ def load_model():
     :type: MODELSentimentClassifier
     """
 
-    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #The directory where models are located is established
@@ -66,8 +66,9 @@ def load_model():
 
     #If trained models exist, they are listed for user to choose one of them
     else:
-        #Available model files are obtained
+        #Available model files are obtained and sorted
         list_models_files = os.listdir(address)
+        list_models_files.sort()
         
         #Select the name of one of the models
         name_file = models_menu(list_models_files)
@@ -203,7 +204,7 @@ def use_classify_model(configuration_main, device):
         tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'])
 
         #User mesagge
-        text = console.input("Inserte el texto que quiere clasificar:\n")
+        text = console.input("Inserte el texto que quiere clasificar en inglés:\n")
 
         #Coding of input data
         encoding_text = tokenizer.encode_plus(
@@ -227,9 +228,9 @@ def use_classify_model(configuration_main, device):
         _, preds = torch.max(outputs, dim = 1)
 
         if preds:
-            print("Clasificación: Suicide")
+            print("\nClasificación: Suicide\n")
         else:
-            print("Clasificación: Non-Suicide")
+            print("\nClasificación: Non-Suicide\n")
 
 
 def customize_parameter_configuration(configuration_main):

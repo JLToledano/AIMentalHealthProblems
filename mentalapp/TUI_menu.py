@@ -1,6 +1,4 @@
 """File containing the console message printing functions"""
-import os
-import msvcrt
 
 from rich import box
 from rich.console import Console
@@ -11,19 +9,6 @@ from rich.theme import Theme
 from rich.table import Table, Column
 from rich.prompt import Prompt, IntPrompt, FloatPrompt
 from rich.tree import Tree
-
-def clear_console():
-    """
-    Function to clean the execution console
-    :return: Nothing
-    """
-
-    #If the system on which it runs is windows
-    if os.name == "nt":
-        os.system("cls")
-    #If the system on which it is running is linux
-    else:
-        os.system("clear")
 
 
 def welcome_menu():
@@ -139,7 +124,7 @@ def help_menu():
     """
     
     #Customization of the console with special predefined styles
-    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #Design and printing of welcome message
@@ -154,9 +139,6 @@ def help_menu():
     console.print(Panel.fit("[error]WARNING[/error]", border_style="red"))
     console.print()
 
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
     #Design and printing of the explanatory message menu option 1
     first_option_table = Table(expand = True)
     first_option_table.add_column("[option]OPCIÓN 1[/option] Utilizar modelo preentrenado", justify="full")
@@ -164,9 +146,6 @@ def help_menu():
     """En esta opción se podrá elegir una de las redes neuronales pre-entrenadas disponibles en la aplicación. Después de efectuar la elección, se pedirá un texto que deberá escribirse en inglés y el cuál representa un mensaje que será analizado por la red neuronal. El resultado del análisis reflejará si el mensaje tiene señales de una posible intención de suicidio o no."""
     )
     console.print(first_option_table)
-
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
 
     #Design and printing of the explanatory message menu option 2
     second_option_table = Table(expand = True)
@@ -178,9 +157,6 @@ def help_menu():
     )
     console.print(second_option_table)
 
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
     #Design and printing of the explanatory message menu option 3
     third_option_table = Table(expand = True)
     third_option_table.add_column("[option]OPCIÓN 3[/option] Evaluar modelo", justify = "full")
@@ -191,15 +167,12 @@ def help_menu():
     )
     console.print(third_option_table)
 
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
     #Design and printing of the explanatory message menu option 4
     fourth_option_table_parameters = Table(box = box.HEAVY)
-    fourth_option_table_parameters.add_column("Parameter", justify = "center")
-    fourth_option_table_parameters.add_column("Default value", justify = "center")
-    fourth_option_table_parameters.add_column("Definition", justify = "full")
-    fourth_option_table_parameters.add_column("Considerations", justify = "center")
+    fourth_option_table_parameters.add_column("Parámetro", justify = "center")
+    fourth_option_table_parameters.add_column("Valor por defecto", justify = "center")
+    fourth_option_table_parameters.add_column("Definición", justify = "full")
+    fourth_option_table_parameters.add_column("Consideraciones", justify = "center")
     
     fourth_option_table_parameters.add_row("MAX_DATA_LEN", "200", "Número de palabras máximo que admite el modelo neuronal. El resto de palabras se truncan", "")
     fourth_option_table_parameters.add_row("BATCH_SIZE", "16", "Tamaño de lote. Número de datos que se insertan en la red neuronal cada vez", "")
@@ -218,9 +191,6 @@ def help_menu():
     )
     fourth_option_table.add_row(fourth_option_table_parameters)
     console.print(fourth_option_table)
-    
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
 
     #Design and printing of the explanatory message menu option 5
     fifth_option_table = Table(expand = True)
@@ -236,9 +206,6 @@ def help_menu():
     )
     console.print(fifth_option_table)
 
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
     #Design and printing of the explanatory message menu option 6
     sixth_option_table = Table(expand = True)
     sixth_option_table.add_column("[option]OPCIÓN 6[/option] Ayuda", justify = "full")
@@ -249,9 +216,6 @@ def help_menu():
     )
     console.print(sixth_option_table)
 
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
     #Design and printing of the explanatory message menu option 7
     seventh_option_table = Table(expand = True)
     seventh_option_table.add_column("[option]OPCIÓN 7[/option] Salir", justify = "full")
@@ -261,12 +225,6 @@ def help_menu():
     """Los modelos entrenados persistirán al apagado de la aplicación pero no los cambios realizados en la configuración de entrenamiento."""
     )
     console.print(seventh_option_table)
-
-    #It waits for user to press a key to continue displaying menu
-    msvcrt.getch()
-
-    #The console is cleared after entire help menu has been displayed
-    clear_console()
 
 
 def metrics_menu(confusion_matrix, accurancy, recall, precision, f1, execution_time):
@@ -358,7 +316,7 @@ def models_menu(list_models_files):
     :type: String
     """
 
-    custom_theme = Theme({"error": "red", "range":"yellow", "index":"purple"})
+    custom_theme = Theme({"error":"red", "range":"yellow", "index":"purple"})
     console = Console(theme = custom_theme)
 
     #User is asked how many files he/she wants for each directory in the "paging"
@@ -480,8 +438,9 @@ def models_menu(list_models_files):
 
             #If position of chosen file exists, file name is obtained and returned
             try:
-                #This filter is performed because the position 0 - 1 (-1) in Python returns last value in list
-                if file_position == 0:
+                #This filter is performed because the position 0 - 1 (-1) in Python returns last value in list. 
+                #In addition, negative values are not valid
+                if file_position <= 0:
                     console.print("Número de [error]fichero no válido[/error]\n")
 
                 else:
