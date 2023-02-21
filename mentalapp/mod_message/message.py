@@ -29,6 +29,7 @@ class Message:
 
         return self.__text
 
+
     def get_type_class(self):
         """
         Obtaining message classification

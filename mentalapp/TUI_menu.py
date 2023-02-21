@@ -124,7 +124,7 @@ def help_menu():
     """
     
     #Customization of the console with special predefined styles
-    custom_theme = Theme({"success": "green", "error": "red", "option":"yellow", "required_parameter":"purple"})
+    custom_theme = Theme({"success":"green", "error":"red", "option":"yellow", "required_parameter":"purple"})
     console = Console(theme = custom_theme)
 
     #Design and printing of welcome message
@@ -316,7 +316,7 @@ def models_menu(list_models_files):
     :type: String
     """
 
-    custom_theme = Theme({"error": "red", "range":"yellow", "index":"purple"})
+    custom_theme = Theme({"error":"red", "range":"yellow", "index":"purple"})
     console = Console(theme = custom_theme)
 
     #User is asked how many files he/she wants for each directory in the "paging"
