@@ -1,3 +1,5 @@
+"""File containing different user selectable functions"""
+
 import os
 import pathlib
 import torch
@@ -14,6 +16,7 @@ from rich.prompt import Confirm
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from trainer import train_model, eval_model
 from TUI_menu import models_menu
+from model_selector import model_selector
 
 def save_model(model):
     """
@@ -114,14 +117,14 @@ def training_model_scratch(configuration_main, device, train_dataset):
     :type: Dataset
     :return: Nothing
     """
-    #Function transforming input data into special codes (tokens) for BERT model
-    tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
+
+    #Basic configuration of a model is loaded
+    model_configuration = model_selector(configuration_main)
+    model = model_configuration['model']
+    tokenizer = model_configuration['tokenizer']
 
     #Creation of Pytorch dataset for training
     train_data_loader = data_loader(train_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
-
-    #Creation of BERT model
-    model = BERTSentimentClassifier(configuration_main['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration_main['PRE_TRAINED_MODEL_NAME']['Bert'], configuration_main['DROP_OUT_BERT'])
 
     #Model is taken to the GPU if available
     model = model.to(device)
@@ -173,8 +176,9 @@ def evaluating_model_pretraining(configuration_main, device, test_dataset):
 
     #If it has been possible to select a model, text is requested and sorted
     if model is not None:
-        #Function transforming input data into special codes (tokens) for BERT model
-        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
+        #Basic configuration of a model is loaded
+        model_configuration = model_selector(configuration_main)
+        tokenizer = model_configuration['tokenizer']
 
         #Creation of Pytorch dataset for evaluating
         test_data_loader = data_loader(test_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
@@ -200,11 +204,12 @@ def use_classify_model(configuration_main, device):
 
     #If it has been possible to select a model, text is requested and sorted
     if model is not None:
-        #Function transforming input data into special codes (tokens) for BERT model
-        tokenizer = BertTokenizer.from_pretrained(configuration_main['PRE_TRAINED_MODEL_NAME']['BERT'])
+        #Basic configuration of a model is loaded
+        model_configuration = model_selector(configuration_main)
+        tokenizer = model_configuration['tokenizer']
 
         #User mesagge
-        text = console.input("Inserte el texto que quiere clasificar en inglés:\n")
+        text = console.input("\nInserte el texto que quiere clasificar en inglés:\n")
 
         #Coding of input data
         encoding_text = tokenizer.encode_plus(
