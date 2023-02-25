@@ -122,6 +122,7 @@ def training_model_scratch(configuration_main, device, train_dataset):
     model_configuration = model_selector(configuration_main)
     model = model_configuration['model']
     tokenizer = model_configuration['tokenizer']
+    name_model = model_configuration['name_model']
 
     #Creation of Pytorch dataset for training
     train_data_loader = data_loader(train_dataset,tokenizer,configuration_main['MAX_DATA_LEN'],configuration_main['BATCH_SIZE'],configuration_main['DATALOADER_NUM_WORKERS'])
@@ -152,7 +153,7 @@ def training_model_scratch(configuration_main, device, train_dataset):
 
         #Model training and parameter update
         model, optimizer, scheduler = train_model(
-            model, train_data_loader, loss_fn, optimizer, device, scheduler
+            model, train_data_loader, loss_fn, optimizer, device, scheduler, name_model
         )
     
     #Trained model is stored
