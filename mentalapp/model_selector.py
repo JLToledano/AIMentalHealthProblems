@@ -1,12 +1,13 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
 from rich.theme import Theme
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
+from mod_distilBERT.model_distilBERT import DistilBERTSentimentClassifier
 
 def model_selector(configuration):
     """
@@ -24,7 +25,8 @@ def model_selector(configuration):
     
     model_selection = False
     pre_trained_model_configurations = {
-        'BERT': 'BERT_configurations(configuration)'
+        'BERT': 'BERT_configurations(configuration)',
+        #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
     }
     
     #As long as a pre-trained model has not been selected
@@ -68,5 +70,29 @@ def BERT_configurations(configuration):
     BERT_configuration = {}
     BERT_configuration['model'] = model
     BERT_configuration['tokenizer'] = tokenizer
+    BERT_configuration['name_model'] = 'BERT'
+
     return BERT_configuration
 
+
+def DISTILBERT_configurations(configuration):
+    """
+    Configuration of the DistilBERT model and tokeniser
+    :param configuration: General model configurations
+    :type: dict[String:String]
+    :return: DistilBERT model and DistilBERT tokenizer
+    :type: dict[String:MODELSentimentClassifier/Tokenizer]
+    """
+
+    #Function transforming input data into special codes (tokens) for DistilBERT model
+    tokenizer = DistilBertTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['DistilBERT'])
+    
+    #Creation of DistilBERT model
+    model = DistilBERTSentimentClassifier(configuration['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration['PRE_TRAINED_MODEL_NAME']['DistilBERT'], configuration['DROP_OUT_BERT'])
+
+    DistilBERT_configuration = {}
+    DistilBERT_configuration['model'] = model
+    DistilBERT_configuration['tokenizer'] = tokenizer
+    DistilBERT_configuration['name_model'] = 'DistilBERT'
+
+    return DistilBERT_configuration
