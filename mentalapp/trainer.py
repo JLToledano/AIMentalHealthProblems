@@ -10,7 +10,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from TUI_menu import metrics_menu
 
-def train_model(model, data_loader, loss_fn, optimizer, device, scheduler):
+def train_model(model, data_loader, loss_fn, optimizer, device, scheduler, name_model):
     """
     Function that trains a complete model with input data and configurations provided
     :param model: Complete neural model
@@ -25,6 +25,8 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler):
     :type: Device
     :param scheduler: Function to progressively reduce learning rate
     :type: LambdaLR
+    :param name_model: Name of basic technology of the model
+    :type: String
     :return: Trained model
     :type: MODELSentimentClassifier
     :return: Upgraded optimizer
@@ -64,19 +66,36 @@ def train_model(model, data_loader, loss_fn, optimizer, device, scheduler):
             labels = batch['text_clasification'].to(device)
             #Model outputs are computed
             outputs = model(input_ids = input_ids, attention_mask = attention_mask)
-            #Predictions are calculated (in this case or performed by BERT).Maximum of 2 outputs is taken
-            #If first one is the maximum, suicide, if second one is the maximum, non-suicide
-            _, preds = torch.max(outputs, dim = 1)
 
-            #Labels is added to labels tensor
-            tensor_labels = torch.cat((tensor_labels,labels))
-            #Predictions made is added to predictions tensor
-            tensor_predictions = torch.cat((tensor_predictions,preds))
+            #DistilBERT model does not return values in same format as other models.
+            if name_model != 'DistilBERT':
+                #Predictions are calculated. Maximum of 2 outputs is taken
+                #If first one is the maximum, suicide, if second one is the maximum, non-suicide
+                loss, preds = torch.max(outputs, dim = 1)
 
-            #Error calculation
-            loss = loss_fn(outputs, labels)
-            #Error is back-propagated
-            loss.backward()
+                #Labels is added to labels tensor
+                tensor_labels = torch.cat((tensor_labels,labels))
+                #Predictions made is added to predictions tensor
+                tensor_predictions = torch.cat((tensor_predictions,preds))
+
+                #Error calculation
+                loss = loss_fn(outputs, labels)
+                #Error is back-propagated
+                loss.backward()
+            else:
+                #Predictions are calculated. Maximum of 2 outputs is taken
+                #If first one is the maximum, suicide, if second one is the maximum, non-suicide
+                _, preds = torch.max(outputs, dim = 1)
+
+                #Labels is added to labels tensor
+                tensor_labels = torch.cat((tensor_labels,labels))
+                #Predictions made is added to predictions tensor
+                tensor_predictions = torch.cat((tensor_predictions,preds))
+
+                #Error calculation
+                loss = outputs.loss
+                #Error is back-propagated
+                loss.backward()
 
             #Gradient is prevented from increasing too much so as not to slow down progress of training with excessively large jumps
             #Gradient value is always kept between -1 and 1.
