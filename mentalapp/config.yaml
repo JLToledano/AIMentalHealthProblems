@@ -7,4 +7,6 @@ NUM_TYPES_CLASSIFICATION_CLASSES: 2
 DATALOADER_NUM_WORKERS: 1
 DROP_OUT_BERT: 0.3
 PRE_TRAINED_MODEL_NAME:
-  Bert: bert-base-cased
+  BERT: bert-base-cased
+  DistilBERT: distilbert-base-cased
+  AlBERT: albert-base-v2
