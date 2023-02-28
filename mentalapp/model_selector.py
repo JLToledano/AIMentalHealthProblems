@@ -1,6 +1,6 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer, DistilBertTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
@@ -8,6 +8,7 @@ from rich.theme import Theme
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from mod_distilBERT.model_distilBERT import DistilBERTSentimentClassifier
+from mod_alBERT.model_alBERT import AlBERTSentimentClassifier
 
 def model_selector(configuration):
     """
@@ -27,6 +28,7 @@ def model_selector(configuration):
     pre_trained_model_configurations = {
         'BERT': 'BERT_configurations(configuration)',
         #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
+        'ALBERT': 'AlBERT_configurations(configuration)'
     }
     
     #As long as a pre-trained model has not been selected
@@ -96,3 +98,26 @@ def DISTILBERT_configurations(configuration):
     DistilBERT_configuration['name_model'] = 'DistilBERT'
 
     return DistilBERT_configuration
+
+
+def AlBERT_configurations(configuration):
+    """
+    Configuration of the AlBERT model and tokeniser
+    :param configuration: General model configurations
+    :type: dict[String:String]
+    :return: AlBERT model and AlBERT tokenizer
+    :type: dict[String:MODELSentimentClassifier/Tokenizer]
+    """
+
+    #Function transforming input data into special codes (tokens) for BERT model
+    tokenizer = AlbertTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['AlBERT'])
+    
+    #Creation of BERT model
+    model = AlBERTSentimentClassifier(configuration['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration['PRE_TRAINED_MODEL_NAME']['AlBERT'], configuration['DROP_OUT_BERT'])
+
+    AlBERT_configuration = {}
+    AlBERT_configuration['model'] = model
+    AlBERT_configuration['tokenizer'] = tokenizer
+    AlBERT_configuration['name_model'] = 'AlBERT'
+
+    return AlBERT_configuration
