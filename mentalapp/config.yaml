@@ -10,3 +10,4 @@ PRE_TRAINED_MODEL_NAME:
   BERT: bert-base-cased
   DistilBERT: distilbert-base-cased
   AlBERT: albert-base-v2
+  RoBERTa: roberta-base
