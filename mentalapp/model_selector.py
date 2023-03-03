@@ -1,6 +1,6 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
@@ -9,6 +9,7 @@ from rich.theme import Theme
 from mod_BERT.model_BERT import BERTSentimentClassifier
 from mod_distilBERT.model_distilBERT import DistilBERTSentimentClassifier
 from mod_alBERT.model_alBERT import AlBERTSentimentClassifier
+from mod_roBERTa.model_roBERTa import RoBERTaSentimentClassifier
 
 def model_selector(configuration):
     """
@@ -28,7 +29,8 @@ def model_selector(configuration):
     pre_trained_model_configurations = {
         'BERT': 'BERT_configurations(configuration)',
         #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
-        'ALBERT': 'AlBERT_configurations(configuration)'
+        'ALBERT': 'AlBERT_configurations(configuration)',
+        'ROBERTA': 'ROBERTA_configurations(configuration)'
     }
     
     #As long as a pre-trained model has not been selected
@@ -109,7 +111,7 @@ def AlBERT_configurations(configuration):
     :type: dict[String:MODELSentimentClassifier/Tokenizer]
     """
 
-    #Function transforming input data into special codes (tokens) for BERT model
+    #Function transforming input data into special codes (tokens) for AlBERT model
     tokenizer = AlbertTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['AlBERT'])
     
     #Creation of BERT model
@@ -121,3 +123,26 @@ def AlBERT_configurations(configuration):
     AlBERT_configuration['name_model'] = 'AlBERT'
 
     return AlBERT_configuration
+
+
+def ROBERTA_configurations(configuration):
+    """
+    Configuration of the RoBERTa model and tokeniser
+    :param configuration: General model configurations
+    :type: dict[String:String]
+    :return: RoBERTa model and RoBERTa tokenizer
+    :type: dict[String:MODELSentimentClassifier/Tokenizer]
+    """
+
+    #Function transforming input data into special codes (tokens) for RoBERTa model
+    tokenizer = RobertaTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['RoBERTa'])
+    
+    #Creation of RoBERTa model
+    model = RoBERTaSentimentClassifier(configuration['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration['PRE_TRAINED_MODEL_NAME']['RoBERTa'], configuration['DROP_OUT_BERT'])
+
+    RoBERTa_configuration = {}
+    RoBERTa_configuration['model'] = model
+    RoBERTa_configuration['tokenizer'] = tokenizer
+    RoBERTa_configuration['name_model'] = 'RoBERTa'
+
+    return RoBERTa_configuration
