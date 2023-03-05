@@ -11,3 +11,4 @@ PRE_TRAINED_MODEL_NAME:
   DistilBERT: distilbert-base-cased
   AlBERT: albert-base-v2
   RoBERTa: roberta-base
+  MegatronBERT: megatron-bert

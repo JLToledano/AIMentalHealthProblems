@@ -1,6 +1,6 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer, AutoTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
@@ -10,6 +10,7 @@ from mod_BERT.model_BERT import BERTSentimentClassifier
 from mod_distilBERT.model_distilBERT import DistilBERTSentimentClassifier
 from mod_alBERT.model_alBERT import AlBERTSentimentClassifier
 from mod_roBERTa.model_roBERTa import RoBERTaSentimentClassifier
+from mod_megatronBERT.model_megatronBERT import MegatronBERTSentimentClassifier
 
 def model_selector(configuration):
     """
@@ -30,7 +31,8 @@ def model_selector(configuration):
         'BERT': 'BERT_configurations(configuration)',
         #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
         'ALBERT': 'AlBERT_configurations(configuration)',
-        'ROBERTA': 'ROBERTA_configurations(configuration)'
+        'ROBERTA': 'ROBERTA_configurations(configuration)',
+        'MEGATRONBERT': 'MEGATRONBERT_configurations(configuration)'
     }
     
     #As long as a pre-trained model has not been selected
@@ -146,3 +148,26 @@ def ROBERTA_configurations(configuration):
     RoBERTa_configuration['name_model'] = 'RoBERTa'
 
     return RoBERTa_configuration
+
+
+def MEGATRONBERT_configurations(configuration):
+    """
+    Configuration of the MegatronBERT model and tokeniser
+    :param configuration: General model configurations
+    :type: dict[String:String]
+    :return: MegatronBERT model and MegatronBERT tokenizer
+    :type: dict[String:MODELSentimentClassifier/Tokenizer]
+    """
+
+    #Function transforming input data into special codes (tokens) for MegatronBERT model
+    tokenizer = AutoTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['MegatronBERT'])
+    
+    #Creation of MegatronBERT model
+    model = MegatronBERTSentimentClassifier(configuration['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration['PRE_TRAINED_MODEL_NAME']['MegatronBERT'], configuration['DROP_OUT_BERT'])
+
+    MegatronBERT_configuration = {}
+    MegatronBERT_configuration['model'] = model
+    MegatronBERT_configuration['tokenizer'] = tokenizer
+    MegatronBERT_configuration['name_model'] = 'MegatronBERT'
+
+    return MegatronBERT_configuration
