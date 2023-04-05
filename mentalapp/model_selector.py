@@ -1,6 +1,6 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer, AutoTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
@@ -30,7 +30,7 @@ def model_selector(configuration):
         'BERT': 'BERT_configurations(configuration)',
         #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
         'ALBERT': 'AlBERT_configurations(configuration)',
-        'ROBERTA': 'ROBERTA_configurations(configuration)'
+        'ROBERTA': 'ROBERTA_configurations(configuration)',
     }
     
     #As long as a pre-trained model has not been selected
