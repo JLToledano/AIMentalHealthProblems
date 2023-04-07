@@ -1,13 +1,12 @@
 """File to select different models and prepare the appropriate configuration"""
 
-from transformers import BertTokenizer, DistilBertTokenizer, AlbertTokenizer, RobertaTokenizer, AutoTokenizer
+from transformers import BertTokenizer, AlbertTokenizer, RobertaTokenizer
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.panel import Panel
 from rich.theme import Theme
 
 from mod_BERT.model_BERT import BERTSentimentClassifier
-from mod_distilBERT.model_distilBERT import DistilBERTSentimentClassifier
 from mod_alBERT.model_alBERT import AlBERTSentimentClassifier
 from mod_roBERTa.model_roBERTa import RoBERTaSentimentClassifier
 
@@ -28,7 +27,6 @@ def model_selector(configuration):
     model_selection = False
     pre_trained_model_configurations = {
         'BERT': 'BERT_configurations(configuration)',
-        #'DISTILBERT': 'DISTILBERT_configurations(configuration)'
         'ALBERT': 'AlBERT_configurations(configuration)',
         'ROBERTA': 'ROBERTA_configurations(configuration)',
     }
@@ -77,29 +75,6 @@ def BERT_configurations(configuration):
     BERT_configuration['name_model'] = 'BERT'
 
     return BERT_configuration
-
-
-def DISTILBERT_configurations(configuration):
-    """
-    Configuration of the DistilBERT model and tokeniser
-    :param configuration: General model configurations
-    :type: dict[String:String]
-    :return: DistilBERT model and DistilBERT tokenizer
-    :type: dict[String:MODELSentimentClassifier/Tokenizer]
-    """
-
-    #Function transforming input data into special codes (tokens) for DistilBERT model
-    tokenizer = DistilBertTokenizer.from_pretrained(configuration['PRE_TRAINED_MODEL_NAME']['DistilBERT'])
-    
-    #Creation of DistilBERT model
-    model = DistilBERTSentimentClassifier(configuration['NUM_TYPES_CLASSIFICATION_CLASSES'], configuration['PRE_TRAINED_MODEL_NAME']['DistilBERT'], configuration['DROP_OUT_BERT'])
-
-    DistilBERT_configuration = {}
-    DistilBERT_configuration['model'] = model
-    DistilBERT_configuration['tokenizer'] = tokenizer
-    DistilBERT_configuration['name_model'] = 'DistilBERT'
-
-    return DistilBERT_configuration
 
 
 def AlBERT_configurations(configuration):
