@@ -74,6 +74,28 @@ def welcome_menu():
     console.print(welcome_message_markdown)
 
 
+def sample_data_menu(number_train_data, number_test_data):
+    """
+    Function which prints amount of data present for training and evaluation
+    :param number_train_data:Number of data dedicated to training
+    :type: Int
+    :param number_test_data: Number of data dedicated to testing
+    :type: Int
+    :return: Nothing
+    """
+    
+    console = Console()
+
+    #Training data panel
+    training_data_message = "DATOS DE ENTRENAMIENTO: " + str(number_train_data)
+    training_data_message_align = Align(training_data_message, align="left")
+    console.print(Panel(training_data_message_align, style="bold"))
+
+    #Evaluation data panel
+    evaluation_data_message = "DATOS DE EVALUACIÓN: " + str(number_test_data)
+    evaluation_data_message_align = Align(evaluation_data_message, align="left")
+    console.print(Panel(evaluation_data_message_align, style="bold"))
+
 def option_menu():
     """
     Function which prints the options message
