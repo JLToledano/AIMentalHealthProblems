@@ -1,0 +1,10 @@
+name: AIMentalHealth
+channels:
+  - defaults
+dependencies:
+  - transformers
+  - rich
+  - pandas
+  - numpy
+  - python=3.9.16
+  - scikit-learn
