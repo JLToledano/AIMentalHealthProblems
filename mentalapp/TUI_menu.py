@@ -343,6 +343,9 @@ def models_menu(list_models_files):
 
     #User is asked how many files he/she wants for each directory in the "paging"
     dir_number_files = IntPrompt.ask("Por favor indique el número de ficheros por directorio", default=25)
+    #If you select either files per directory or a negative quantity, one file per directory is assigned by default
+    if dir_number_files <= 0:
+        dir_number_files = 1
 
     #Resulting number of directories is calculated
     number_dirs = len(list_models_files) // dir_number_files
