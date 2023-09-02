@@ -199,6 +199,7 @@ def use_classify_model(configuration_main, device):
     """
 
     console = Console()
+    repeat_process = True
 
     #Pre-trained Torch model is loaded
     model = load_model()
@@ -209,34 +210,37 @@ def use_classify_model(configuration_main, device):
         model_configuration = model_selector(configuration_main)
         tokenizer = model_configuration['tokenizer']
 
-        #User mesagge
-        text = console.input("\nInserte el texto que quiere clasificar en inglés:\n")
+        while repeat_process:
+            #User mesagge
+            text = console.input("\nInserte el texto que quiere clasificar en inglés:\n")
 
-        #Coding of input data
-        encoding_text = tokenizer.encode_plus(
-            text, #Original message
-            max_length = configuration_main['MAX_DATA_LEN'], #Maximum number of tokens (counting special tokens)
-            truncation = True, #Ignoring tokens beyond the set number of tokens
-            add_special_tokens = True, #Special tokens [CLS], [SEP] and [PAD] added
-            return_token_type_ids = False,
-            padding = 'max_length', #If total number of tokens is less than the established maximum, it is filled with [PAD] until the maximum is reached
-            return_attention_mask = True, #Model is instructed to pay attention only to non-empty tokens during training
-            return_tensors = 'pt' #Final result of the encoder in Pytorch numbers
-        )
+            #Coding of input data
+            encoding_text = tokenizer.encode_plus(
+                text, #Original message
+                max_length = configuration_main['MAX_DATA_LEN'], #Maximum number of tokens (counting special tokens)
+                truncation = True, #Ignoring tokens beyond the set number of tokens
+                add_special_tokens = True, #Special tokens [CLS], [SEP] and [PAD] added
+                return_token_type_ids = False,
+                padding = 'max_length', #If total number of tokens is less than the established maximum, it is filled with [PAD] until the maximum is reached
+                return_attention_mask = True, #Model is instructed to pay attention only to non-empty tokens during training
+                return_tensors = 'pt' #Final result of the encoder in Pytorch numbers
+            )
 
-        input_ids = encoding_text['input_ids'].to(device) #Numeric input tokens and special tokens
-        attention_mask = encoding_text['attention_mask'].to(device) #Attention mask
+            input_ids = encoding_text['input_ids'].to(device) #Numeric input tokens and special tokens
+            attention_mask = encoding_text['attention_mask'].to(device) #Attention mask
 
-        #Model outputs are computed
-        outputs = model(input_ids = input_ids, attention_mask = attention_mask)
-        #Predictions are calculated. Maximum of 2 outputs is taken
-        #If first one is the maximum, suicide, if second one is the maximum, non-suicide
-        _, preds = torch.max(outputs, dim = 1)
+            #Model outputs are computed
+            outputs = model(input_ids = input_ids, attention_mask = attention_mask)
+            #Predictions are calculated. Maximum of 2 outputs is taken
+            #If first one is the maximum, suicide, if second one is the maximum, non-suicide
+            _, preds = torch.max(outputs, dim = 1)
 
-        if preds:
-            print("\nClasificación: Suicide\n")
-        else:
-            print("\nClasificación: Non-Suicide\n")
+            if preds:
+                print("\nClasificación: Suicide\n")
+            else:
+                print("\nClasificación: Non-Suicide\n")
+
+            repeat_process = Confirm.ask("¿Quiere analizar otro mensaje?")
 
 
 def customize_parameter_configuration(configuration_main):
