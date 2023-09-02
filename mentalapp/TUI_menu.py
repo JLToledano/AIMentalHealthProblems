@@ -74,6 +74,28 @@ def welcome_menu():
     console.print(welcome_message_markdown)
 
 
+def sample_data_menu(number_train_data, number_test_data):
+    """
+    Function which prints amount of data present for training and evaluation
+    :param number_train_data:Number of data dedicated to training
+    :type: Int
+    :param number_test_data: Number of data dedicated to testing
+    :type: Int
+    :return: Nothing
+    """
+    
+    console = Console()
+
+    #Training data panel
+    training_data_message = "DATOS DE ENTRENAMIENTO: " + str(number_train_data)
+    training_data_message_align = Align(training_data_message, align="left")
+    console.print(Panel(training_data_message_align, style="bold"))
+
+    #Evaluation data panel
+    evaluation_data_message = "DATOS DE EVALUACIÓN: " + str(number_test_data)
+    evaluation_data_message_align = Align(evaluation_data_message, align="left")
+    console.print(Panel(evaluation_data_message_align, style="bold"))
+
 def option_menu():
     """
     Function which prints the options message
@@ -321,6 +343,9 @@ def models_menu(list_models_files):
 
     #User is asked how many files he/she wants for each directory in the "paging"
     dir_number_files = IntPrompt.ask("Por favor indique el número de ficheros por directorio", default=25)
+    #If you select either files per directory or a negative quantity, one file per directory is assigned by default
+    if dir_number_files <= 0:
+        dir_number_files = 1
 
     #Resulting number of directories is calculated
     number_dirs = len(list_models_files) // dir_number_files

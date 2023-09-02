@@ -11,7 +11,7 @@ from rich.theme import Theme
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from TUI_menu import option_menu, welcome_menu, help_menu
+from TUI_menu import option_menu, welcome_menu, help_menu, sample_data_menu
 from mod_dataset.dataset import Dataset
 from menu_options import *
 
@@ -36,10 +36,11 @@ def dataset_initialize():
     #All data are read from the source file
     raw_data = complete_dataset.read_file(configuration_main['FILE_DATASET_NAME'])
     #A sample of the data is taken for testing.
-    raw_data = raw_data[0:20]
+    #raw_data =  raw_data[0:len(raw_data)//2]
     #The data is divided between training and evaluation. The parameter test_size marks the percent per one of data for evaluation.
     train_raw_data,test_raw_data = train_test_split(raw_data, test_size = 0.2, random_state = configuration_main['RANDOM_SEED'])
-    
+    sample_data_menu(len(train_raw_data),len(test_raw_data))
+
     #Dataframes are put in the required format.
     complete_dataset.format_dataset(raw_data)
     train_dataset.format_dataset(train_raw_data)
